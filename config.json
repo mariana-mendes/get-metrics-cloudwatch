@@ -1,7 +1,7 @@
 {
-  "period": [],
-  "startTime": "31231",
-  "endTime": "313123",
-  "instanceIds": ["31231", "312312", "321311"],
-  "metricName": []
+    "metricName": "", 
+    "endTime": "", 
+    "period": "", 
+    "startTime": "", 
+    "instanceIds": []
 }

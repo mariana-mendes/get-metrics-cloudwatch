@@ -1,36 +1,38 @@
 import os 
 import sys
 import json 
+import constants as cons
 sys.path.append("./collector")
 
 from collector import CollectorAgent as CW
 
-# Opening JSON file 
 with open('config.json', 'r+') as f:
-  ## detect instances ids
-  ## run command to get id list
 
   data = json.load(f)
-  print("Hello! The current config is: \n")
-  print data
-  ans = raw_input("Do you want edit this file? [Y/n]: ")
+  print(cons.HELLO)
+  print json.dumps(data, indent=2, sort_keys=True)
+
+  ans = raw_input(cons.ASK_FOR_CONFIG)
+
   if(ans == "Y"): 
-    instances = map(str,raw_input('enter instances ids').split())
-    metric = raw_input('metric name')
-    start = raw_input('start')
-    end = raw_input('end')
-    period = raw_input('period')
-    data['instanceIds'] = instances
-    data['metricName'] = metric
-    data['startTime'] = start
-    data['endTime'] = end
-    data['period'] = period
+    instances = map(str,raw_input("Enter field " + cons.IDS_KEY + ": ").split())
+    data[cons.IDS_KEY] = instances
+    
+    config_fields = [cons.METRIC_KEY, cons.START_TIME_KEY, cons.END_TIME_KEY, cons.PERIOD_KEY]
+
+    for field in config_fields:
+      value = raw_input("Enter field " + field + ": ")
+      data[field] = value
+
+
     f.seek(0)        
     json.dump(data, f, indent=4)
     f.truncate()    
-    print "json file result "
-    print data
-  collc = CW(data['metricName'],  data['instanceIds'],  data['startTime'],  data['endTime'], data['period'])
+    print cons.RESULT_FILE
+    print json.dumps(data, indent=2, sort_keys=True)
+
+
+  collc = CW(data[cons.METRIC_KEY],  data[cons.IDS_KEY],  data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
   collc.getMetrics()
 
 
