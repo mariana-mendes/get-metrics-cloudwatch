@@ -4,7 +4,7 @@
 ### Setup of a collecting instance
  
 * Launch an EC2 instance. 
-* Create a IAM Role 
+* Create an IAM Role 
     * Create a policy: 
       Using json editor, your policy should look like this
       ```
