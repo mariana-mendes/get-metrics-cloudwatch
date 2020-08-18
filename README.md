@@ -23,14 +23,9 @@
                 "Resource": "*"
             }
         ]
-    }
- ```
-* Attach your new policy to instance
-* Access your instance (ssh etc)
+       }
+      ```
+ 
+ 
 
-Required 
-install python
-install aws cli
-configure aws 
-  
 ![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/diagrama.png)
