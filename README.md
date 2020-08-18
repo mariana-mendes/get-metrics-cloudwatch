@@ -1,7 +1,7 @@
 # get-metrics-cloudwatch
 
 
-### Setup of a collecting instance
+### Setup instance
  
 * Launch an EC2 instance. 
 * Create an IAM Role 
@@ -25,7 +25,19 @@
         ]
        }
       ```
- 
+  * Install python 
+  * Install aws cli 
+  * Run: `aws config` 
+  
+## Setup collector
+
+`git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
+
+run: `crontab -e`, in the end of file add this line:`* * * cd <YOUR-PATH>/get-metrics-cloudwatch && python3 run.py`
+We recommend the confi `* 1 * *`, this means the script will call the api hourly
+
+
+
  
 
 ![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/diagrama.png)
