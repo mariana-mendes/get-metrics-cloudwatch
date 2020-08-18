@@ -25,19 +25,15 @@
         ]
        }
       ```
-  * Install python 
-  * Install aws cli 
-  * Run: `aws config` 
+* Install python 
+* Install aws cli 
+* Run: `aws config` 
   
-## Setup collector
+### Setup collector
 
 `git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
 
-run: `crontab -e`, in the end of file add this line:`* * * cd <YOUR-PATH>/get-metrics-cloudwatch && python3 run.py`
-We recommend the confi `* 1 * *`, this means the script will call the api hourly
-
-
-
+run: `crontab -e`, in the end of file add:`* * * cd <YOUR-PATH>/get-metrics-cloudwatch && python3 run.py`
  
 
 ![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/diagrama.png)
