@@ -13,7 +13,7 @@ class CollectorAgent:
   def getMetrics(self):
     for id in self.instanceIds:
       try:
-        command = Template("aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name $metric --dimensions Name=InstanceId,Value=$idInstance --period $period  --statistics 'Average' --start-time $start --end-time $end  --query 'sort_by(Datapoints,&Timestamp)[*]' >> $id.json")
+        command = Template("aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name $metric --dimensions Name=InstanceId,Value=$idInstance --period $period  --statistics 'Average' --start-time $start --end-time $end  --query 'sort_by(Datapoints,&Timestamp)[*]' >> ./data/$id.json")
         commandString = command.substitute(metric=self.metricName, idInstance=id, period=self.period, start=self.start, end=self.end, id=id)
         os.system(commandString)
       except Exception as e:
