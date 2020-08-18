@@ -1,7 +1,8 @@
 {
-    "startTime": "", 
+    "metricName": "", 
     "endTime": "", 
     "period": "", 
+    "startTime": "", 
     "instanceIds": [
         "i-0b2a67b83f8221206", 
         "i-06398c2587d832076", 
@@ -12,6 +13,5 @@
         "i-0cb5c8145f10c71c0", 
         "i-0f83700588992d1b0", 
         "i-0bb4f149072a32ff6"
-    ], 
-    "metricName": ""
+    ]
 }
