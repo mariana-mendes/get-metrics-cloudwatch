@@ -33,3 +33,4 @@ install python
 install aws cli
 configure aws 
   
+![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/Untitled%20Diagram.png)
