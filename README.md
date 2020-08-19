@@ -1,4 +1,4 @@
-# get-metrics-cloudwatch
+# :construction: under construction :construction: :construction_worker:
 
 ### TO-DO: arranjar um nome legal.
 
@@ -34,14 +34,8 @@
 ### Inital config 
 `git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
 
-* You could edit manually the `config.json` file
+* You can edit manually the `config.json` file
                or 
-* run `./config.py`
-
-
-
-
-run: `crontab -e`, in the end of file add:`* * * cd <YOUR-PATH>/get-metrics-cloudwatch && python3 run.py`
- 
+* run `./config.py` 
 
 ![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/diagrama.png)
