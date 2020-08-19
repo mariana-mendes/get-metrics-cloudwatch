@@ -1,7 +1,7 @@
 {
-    "startTime": "", 
-    "endTime": "", 
-    "period": "", 
+    "startTime": "3123123", 
+    "endTime": "3123123", 
+    "period": "300", 
     "instanceIds": [
         "i-0b2a67b83f8221206", 
         "i-06398c2587d832076", 
@@ -13,5 +13,7 @@
         "i-0f83700588992d1b0", 
         "i-0bb4f149072a32ff6"
     ], 
-    "metricName": ""
+    "metricName": [
+        "mem_usage"
+    ]
 }

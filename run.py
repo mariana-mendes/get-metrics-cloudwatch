@@ -9,7 +9,6 @@ import time
 from collector.collector import CollectorAgent as CW
   
 with open('config.json', 'r+') as f:
-  # os.system(cons.GET_INSTANCES_IDS)
 
   with open('instances.json', 'r+') as i:
     data = json.load(f)
