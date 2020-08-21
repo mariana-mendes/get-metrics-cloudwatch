@@ -26,7 +26,9 @@
         ]
        }
       ```
-* Install python 
+     
+* Install python3
+* Install Crontab lib  ( sudo pip3 install python-crontab)
 * Install aws cli 
 * Run: `aws config` 
   
