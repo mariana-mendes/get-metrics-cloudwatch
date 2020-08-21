@@ -38,8 +38,11 @@ with open('config.json', 'r+') as f:
     print(json.dumps(data, indent=2, sort_keys=True))
  
     print('Getting Instances Description...\n')
-    instancesDescription =  os.system(cons.GET_INSTANCES_IDS)
-    data[cons.INSTANCES_DESCRIPTION] = instancesDescription
+    os.system(cons.GET_INSTANCES_IDS)
+    with open('instances.json', 'r+') as instancesFile:
+      dataInstances = json.load(instancesFile)
+      data[cons.INSTANCES_DESCRIPTION] = dataInstances
+      
 
     f.seek(0)        
     json.dump(data, f, indent=4)
