@@ -38,7 +38,7 @@ with open('config.json', 'r+') as f:
     print(json.dumps(data, indent=2, sort_keys=True))
  
     print('Getting Instances Description...\n')
-    instancesDescription =  os.system(cons.GET_INSTANCES_DESCRIPTION)
+    instancesDescription =  os.system(cons.GET_INSTANCES_IDS)
     data[cons.INSTANCES_DESCRIPTION] = instancesDescription
 
     f.seek(0)        
@@ -47,15 +47,12 @@ with open('config.json', 'r+') as f:
 
     path = os.getcwd()
 
-    commandString = 'cd ' + path + ' && ' + './run.py'
+    commandString = '@hourly cd ' + path + ' && ' + './run.py'
 
     print('Almost done! Editing your crontab file... ')
-
     username = getpass.getuser()
-    print(username)
     cron = CronTab(user=username)
     job = cron.new(command=commandString)
-    job.minute.every(59)
     cron.write()
 
 
