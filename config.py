@@ -4,57 +4,61 @@ import os
 import sys
 import json 
 import constants as cons
-import time
-
+from crontab import CronTab
+import getpass
 from collector.collector import CollectorAgent as CW
   
+
+def getMetricDescription():
+  ans = input(cons.ASK_FOR_NEW_METRIC)
+  descriptions = []
+
+  while ans == '1':
+    metricName = input("Metric name:  ")
+    namespace = input(' \n Namespace: ')
+    newDescription ={'metricName': metricName, 'namespace':namespace}
+    descriptions.append(newDescription)
+    print(descriptions)
+    ans = input(cons.ASK_FOR_NEW_METRIC)
+  return descriptions
+
+
 with open('config.json', 'r+') as f:
   data = json.load(f)
+  ans = input(cons.ASK_FOR_COLLECT_TYPE)
+  
+  if(ans == '1'):
+    metricsDescription = getMetricDescription()
+    data[cons.METRICS_KEY] = metricsDescription
 
-  # os.system(cons.GET_INSTANCES_IDS)
+    gran = input("Granularity of datapoints: ")
+    data[cons.PERIOD_KEY] = gran
 
-  ## Config in case of the user want just one consult a especific period
-  ## First config for json in terminal 
-
-  specificPeriod = input('1. Collect metric in a specific time window \n 2. Automatically collect metrics starting now\n')
-
-  if(specificPeriod == '1'): 
-    ans = input(cons.ASK_FOR_CONFIG)
-
-    if(ans == "Y"): 
-      ### perguntar se quer pra instancias especificas ou todas
-      # instances = map(str,raw_input("Enter field " + cons.IDS_KEY + ": ").split())
-      config_fields = [cons.METRIC_KEY, cons.START_TIME_KEY, cons.END_TIME_KEY, cons.PERIOD_KEY]
-      for field in config_fields:
-        value = input("Enter field " + field + ": ")
-        data[field] = value
+    print(cons.RESULT_FILE)
+    print(json.dumps(data, indent=2, sort_keys=True))
+ 
+    print('Getting Instances Description...\n')
+    instancesDescription =  os.system(cons.GET_INSTANCES_DESCRIPTION)
+    data[cons.INSTANCES_DESCRIPTION] = instancesDescription
 
     f.seek(0)        
     json.dump(data, f, indent=4)
-    f.truncate()    
-    ### revisar arquivo
-    print(cons.RESULT_FILE)
-    print(json.dumps(data, indent=2, sort_keys=True))
+    f.truncate()   
 
-  else: 
-    period = input('Specify the collect period (60s, 300s,...)')
-    metrics = map(str,input('Which metrics do you want? (CPUUtilization, mem_usage)').split())
+    path = os.getcwd()
 
-    data['period'] = period
-    data['metricName'] = metrics
+    commandString = 'cd ' + path + ' && ' + './run.py'
 
-    f.seek(0)        
-    json.dump(data, f, indent=4)
-    f.truncate()    
-    print(cons.RESULT_FILE)
-    print(json.dumps(data, indent=2, sort_keys=True))
+    print('Almost done! Editing your crontab file... ')
+
+    username = getpass.getuser()
+    print(username)
+    cron = CronTab(user=username)
+    job = cron.new(command=commandString)
+    job.minute.every(59)
+    cron.write()
 
 
-    print('Almost done! Now you need to add this: * * * * .......... in your contrab file.')
-
-
-
-
-
-
-
+  else:
+    print('to-do')
+    ## te vira e roda o comando xD

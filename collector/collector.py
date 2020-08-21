@@ -1,23 +1,33 @@
 import os
 from string import Template
+import constants as cons
 
 
 class CollectorAgent:
-  def __init__(self, metricName, instanceIds, start, end, period):
+  def __init__(self, metricName, instanceDescription, start, end, period):
     self.metricName = metricName
-    self.instanceIds = instanceIds
+    self.instanceDescription = instanceDescription
     self.start = start
     self.end = end
     self.period = period
 
+
+
   def getMetrics(self):
-    for id in self.instanceIds:
-      try:
-        command = Template("aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name $metric --dimensions Name=InstanceId,Value=$idInstance --period $period  --statistics 'Average' --start-time $start --end-time $end  --query 'sort_by(Datapoints,&Timestamp)[*]' >> ./data/$id.json")
-        commandString = command.substitute(metric=self.metricName, idInstance=id, period=self.period, start=self.start, end=self.end, id=id)
-        os.system(commandString)
-      except Exception as e:
-        print("Oops!", e.__class__, "occurred.")
-        print()
+    for instance in self.instanceDescription:
+      # try:
+        print(instance)
+        command = Template(cons.GET_CPU_UTILIZATION)
+        # commandString = command.substitute(metric=self.metricName[0], idInstance=instanceId, period=self.period, start=self.start, end=self.end, id=id)
+        # print('>' + commandString)
+        # os.system(commandString)
+      # except Exception as e:
+        # print("Oops!", e.__class__, "occurred.")
+        # print()
    
 
+  def getAWSMetric():
+    return 0
+
+  def getCWAMetric(): 
+    return 0
