@@ -1,0 +1,30 @@
+[
+  [
+    {
+      "type": "c5d.4xlarge",
+      "id": "i-0cb5c8145f10c71c0",
+      "img": "ami-07ad37d513330c432"
+    }
+  ],
+  [
+    {
+      "type": "c5d.4xlarge",
+      "id": "i-0f83700588992d1b0",
+      "img": "ami-02354e95b39ca8dec"
+    }
+  ],
+  [
+    {
+      "type": "c5d.4xlarge",
+      "id": "i-0bb4f149072a32ff6",
+      "img": "ami-04a97c7e8afd17fbe"
+    }
+  ],
+  [
+    {
+      "type": "t2.medium",
+      "id": "i-03a8379299e6d7618",
+      "img": "ami-0f6dd3af18080c704"
+    }
+  ]
+]
