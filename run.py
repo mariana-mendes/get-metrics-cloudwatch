@@ -17,8 +17,11 @@ with open('config.json', 'r+') as f:
     dataInstances = json.load(instancesFile)
     ## verificar se arquivo ta vazio 
     data[cons.INSTANCES_DESCRIPTION] = dataInstances
-    startTime = datetime.utcnow().isoformat()
-    endTime = (datetime.utcnow() - timedelta(hours=1)).isoformat()
+    endTime = datetime.utcnow().isoformat()
+    startTime = (datetime.utcnow() - timedelta(hours=1)).isoformat()
+    data[cons.START_TIME_KEY] = startTime
+    data[cons.END_TIME_KEY] = endTime
+
 
   f.seek(0)        
   json.dump(data, f, indent=4)

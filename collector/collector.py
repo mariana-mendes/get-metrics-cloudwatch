@@ -13,7 +13,7 @@ class CollectorAgent:
   def getAWSMetric(self, metric, instance):
     try:
       command = Template(cons.GET_METRIC_AWS)
-      commandString = command.substitute(metric=metric, idInstance=instance['id'], period=self.period, start=self.start, end=self.end, id=instance['id'])
+      commandString = command.substitute(metric=metric['metricName'], idInstance=instance['id'], period=self.period, start=self.start, end=self.end, id=instance['id'])
       os.system(commandString)
     except Exception as e:
       print("Oops!", e.__class__, "occurred.")
@@ -21,7 +21,7 @@ class CollectorAgent:
   def getCWAMetric(self, metric, instance): 
     try:
       command = Template(cons.GET_METRIC_CWAGENT)
-      commandString = command.substitute(metric=metric, img=instance['img'], type=instance['type'], idInstance=instance['id'], period=self.period, start=self.start, end=self.end, id=instance['id'])
+      commandString = command.substitute(metric=metric['metricName'], img=instance['img'], type=instance['type'], idInstance=instance['id'], period=self.period, start=self.start, end=self.end, id=instance['id'])
       os.system(commandString)
     except Exception as e:
       print("Oops!", e.__class__, "occurred.")
@@ -29,11 +29,10 @@ class CollectorAgent:
   def getMetrics(self):
     for metric in self.metrics:
       for instance in self.instanceDescription:
-        print(metric)
         if(metric['namespace'] == 'AWS/EC2'):
-          self.getAWSMetric(metric, instance)
+          self.getAWSMetric(metric, instance[0])
         else:
-          self.getCWAMetric(metric, instance)
+          self.getCWAMetric(metric, instance[0])
 
 
 
