@@ -30,7 +30,10 @@ class CollectorAgentWithBoto:
         EndTime=dateutil.parser.isoparse(self.end),
         Period=self.period,
         Statistics=['Average','Minimum','Maximum' ],
-    )
+      )
+        f = open( instance['id'] + '.py', 'w' )
+        f.write(response)
+        f.close() 
 
 
 
