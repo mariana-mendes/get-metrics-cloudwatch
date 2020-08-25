@@ -1,6 +1,7 @@
 import os
 from string import Template
 import constants as cons
+import boto3
 
 class CollectorAgent:
   def __init__(self, metrics, instanceDescription, start, end, period):
@@ -9,6 +10,8 @@ class CollectorAgent:
     self.start = start
     self.end = end
     self.period = period
+
+
 
   def getAWSMetric(self, metric, instance):
     try:
