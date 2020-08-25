@@ -23,7 +23,7 @@ class CollectorAgentWithBoto:
         Dimensions=[
             {
                 "Name": "InstanceId",
-                "Value": instance['id']
+                "Value": instance[0]['id']
             },
         ],
         StartTime=dateutil.parser.isoparse(self.start),
@@ -31,8 +31,8 @@ class CollectorAgentWithBoto:
         Period=self.period,
         Statistics=['Average','Minimum','Maximum' ],
       )
-        f = open( instance['id'] + '.py', 'w' )
-        f.write(response)
+        f = open( instance[0]['id'] + '.py', 'w' )
+        f.write(repr(response))
         f.close() 
 
 
