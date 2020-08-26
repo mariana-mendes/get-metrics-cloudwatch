@@ -1,11 +1,9 @@
 import pandas as pd
-from datetime import datetime, timedelta, date
 import os.path
 
 
 def joinMetrics(response, idInstance, metricName):
     datapoints = response["Datapoints"]
- # static fields
     totalRows = len(datapoints)
     metricColumn = [metricName] * totalRows
     idColumn = [idInstance] * totalRows
@@ -31,14 +29,11 @@ def joinMetrics(response, idInstance, metricName):
         'avg': average
     }
     newDf = pd.DataFrame(data=newDict)
-    
     today_file = date.today().strftime("%Y-%m-%d")
-    print('newdf')
-
 
     if(os.path.exists(today_file + '.csv')):
         dtf = pd.read_csv(today_file + '.csv', index_col=0)
-        newOne = dtf.append(newDf, ignore_index = True)
+        newOne = dtf.append(newDf, ignore_index=True)
         print(newOne)
         newOne.to_csv(today_file + ".csv")
     else:
