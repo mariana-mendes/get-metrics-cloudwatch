@@ -5,7 +5,7 @@ import os.path
 
 def joinMetrics(response, idInstance, metricName):
     datapoints = response["Datapoints"]
-    # static fields
+ # static fields
     totalRows = len(datapoints)
     metricColumn = [metricName] * totalRows
     idColumn = [idInstance] * totalRows
@@ -22,7 +22,7 @@ def joinMetrics(response, idInstance, metricName):
         minimum.append(dtp['Minimum'])
         average.append(dtp['Average'])
 
-    newDf = {
+    newDict = {
         'timestamp': time,
         'instanceID': idColumn,
         'metric': metricColumn,
@@ -30,12 +30,16 @@ def joinMetrics(response, idInstance, metricName):
         'min': minimum,
         'avg': average
     }
-    df = pd.DataFrame(data=newDf)
-
+    newDf = pd.DataFrame(data=newDict)
+    
     today_file = date.today().strftime("%Y-%m-%d")
+    print('newdf')
+
 
     if(os.path.exists(today_file + '.csv')):
-        dtf = pd.read_csv(today_file + '.csv')
-        dtf.append(df, ignore_index=True, sort=False)
+        dtf = pd.read_csv(today_file + '.csv', index_col=0)
+        newOne = dtf.append(newDf, ignore_index = True)
+        print(newOne)
+        newOne.to_csv(today_file + ".csv")
     else:
-        df.to_csv(today_file + ".csv")
+        newDf.to_csv(today_file + ".csv")
