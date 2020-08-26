@@ -14,7 +14,7 @@ from collector.collector_boto import CollectorAgentWithBoto as CWB
 
 with open('config.json', 'r+') as f:
     data = json.load(f)
-    # os.system(cons.GET_INSTANCES_IDS)
+    os.system(cons.GET_INSTANCES_IDS)
     with open('instances.json', 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
         # verificar se arquivo ta vazio
