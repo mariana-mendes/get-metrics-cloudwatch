@@ -1,6 +1,6 @@
 import pandas as pd
 import os.path
-
+from datetime import date
 
 def joinMetrics(response, idInstance, metricName):
     datapoints = response["Datapoints"]
@@ -34,7 +34,6 @@ def joinMetrics(response, idInstance, metricName):
     if(os.path.exists(today_file + '.csv')):
         dtf = pd.read_csv(today_file + '.csv', index_col=0)
         newOne = dtf.append(newDf, ignore_index=True)
-        print(newOne)
         newOne.to_csv(today_file + ".csv")
     else:
         newDf.to_csv(today_file + ".csv")
