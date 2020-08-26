@@ -35,8 +35,7 @@ def joinMetrics(response, idInstance, metricName):
     today_file = date.today().strftime("%Y-%m-%d")
 
     if(os.path.exists(today_file + '.csv')):
-        print('exists')
-        # logic to add a new part of dataframe
+        dtf = pd.read_csv(today_file + '.csv')
+        dtf.append(df, ignore_index=True, sort=False)
     else:
         df.to_csv(today_file + ".csv")
-        print('creating')
