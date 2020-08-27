@@ -11,7 +11,7 @@ from log.setup import setup_log
 with open('config.json', 'r+') as f:
     data = json.load(f)
 
-    # os.system(cons.GET_INSTANCES_IDS)
+    os.system(cons.GET_INSTANCES_IDS)
     with open('instances.json', 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
         data[cons.INSTANCES_DESCRIPTION] = dataInstances
