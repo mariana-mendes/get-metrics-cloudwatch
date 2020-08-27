@@ -6,7 +6,6 @@ import json
 import constants as cons
 from crontab import CronTab
 import getpass
-from collector.collector import CollectorAgent as CW
 
 
 def getMetricDescription():
