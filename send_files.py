@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from datetime import date
 from log.setup import setup_log
 import boto3
@@ -11,8 +12,8 @@ logger.info('Initializing transfer data to s3 bucket')
 today_file = date.today().strftime("%Y-%m-%d")
 
 response = client.put_object(
-    Body=today_file + ".csv",
+    Body=(open('./'+today_file+'.csv', 'rb')),
     Bucket='log-ec2-instance',
-    Key='dailydata',
+    Key=today_file,
 )
-print(response)
+print(response['ResponseMetadata']['HTTPStatusCode'])
