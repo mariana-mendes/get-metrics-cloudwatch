@@ -44,7 +44,13 @@ with open('config.json', 'r+') as f:
         username = getpass.getuser()
         cron = CronTab(user=username)
         job = cron.new(command=commandString)
-        job.hour.every(3)
+        job.minute.every(3)
+        cron.write()
+
+        commandFiles = 'cd ' + path + ' && ' + './send_files.py'
+        cron = CronTab(user=username)
+        job = cron.new(command=commandFiles)
+        job.minute.every(5)
         cron.write()
 
     else:
