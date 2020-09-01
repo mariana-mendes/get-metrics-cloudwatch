@@ -1,6 +1,5 @@
-# :construction: under construction :construction: :construction_worker:
+# get-metrics-cloudwatch
 
-### TO-DO: arranjar um nome legal.
 
 ### Setup instance
  
@@ -27,17 +26,19 @@
        }
       ```
      
-* Install python3
-* Install Crontab lib  ( sudo pip3 install python-crontab)
-* Install aws cli 
-* Run: `aws config` 
-  
-  
 ### Inital config 
-`git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
+* Clone the repo:  $ `git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
+* Install dependencies: $ `pip install -r requirements.txt`
 
 * You can edit manually the `config.json` file
                or 
 * run `./config.py` 
+
+### Choosing your metrics
+* Make sure that your metric is already monitored by cloudwatch
+* Check the granularity of points (Default for monitoring in cloudwatch is 300s or 5 minutes)
+* Type correctly the metric name and the namespace.
+* Pay attetion in the name of your S3 bucket. 
+
 
 ![Diagrama](https://github.com/mariana-mendes/get-metrics-cloudwatch/blob/master/diagrama.png)
