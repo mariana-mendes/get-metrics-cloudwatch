@@ -18,7 +18,8 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.INSTANCES_DESCRIPTION] = dataInstances
 
         endTime = datetime.utcnow().isoformat()
-        startTime = (datetime.utcnow() - timedelta(hours=1)).isoformat()
+        startTime = (datetime.utcnow() -
+                     timedelta(hours=cons.FREQUENCY_COLLECTOR)).isoformat()
         data[cons.END_TIME_KEY] = endTime
         data[cons.START_TIME_KEY] = startTime
 

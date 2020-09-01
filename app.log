@@ -1,8 +1,0 @@
-2020-09-01 16:55:03,300 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:09:20,612 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:09:44,458 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:10:37,615 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:11:47,215 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:12:32,798 - logfile - INFO - Initializing transfer data to s3 bucket
-2020-09-01 17:12:34,897 - logfile - ERROR - Something went wrong trying to send files: <class 'FileNotFoundError'>
-2020-09-01 17:12:34,897 - logfile - INFO - Finishing data send to s3 bucket. Status: 404
