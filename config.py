@@ -1,58 +1,58 @@
 #!/usr/bin/env python3
 
-import os 
+import os
 import sys
-import json 
+import json
 import constants as cons
 from crontab import CronTab
 import getpass
-from collector.collector import CollectorAgent as CW
-  
+
 
 def getMetricDescription():
-  ans = input(cons.ASK_FOR_NEW_METRIC)
-  descriptions = []
-
-  while ans == '1':
-    metricName = input("Metric name:  ")
-    namespace = input(' \n Namespace: ')
-    newDescription ={'metricName': metricName, 'namespace':namespace}
-    descriptions.append(newDescription)
-    print(descriptions)
     ans = input(cons.ASK_FOR_NEW_METRIC)
-  return descriptions
+    descriptions = []
+
+    while ans == '1':
+        metricName = input("Metric name:  ")
+        namespace = input('\n Namespace: ')
+        newDescription = {'metricName': metricName, 'namespace': namespace}
+        descriptions.append(newDescription)
+        print(descriptions)
+        ans = input(cons.ASK_FOR_NEW_METRIC)
+    return descriptions
 
 
 with open('config.json', 'r+') as f:
-  data = json.load(f)
-  ans = input(cons.ASK_FOR_COLLECT_TYPE)
-  
-  if(ans == '1'):
-    metricsDescription = getMetricDescription()
-    data[cons.METRICS_KEY] = metricsDescription
+    data = json.load(f)
+    ans = input(cons.ASK_FOR_COLLECT_TYPE)
 
-    gran = input("Granularity of datapoints: ")
-    data[cons.PERIOD_KEY] = gran
+    if(ans == '1'):
+        metricsDescription = getMetricDescription()
+        data[cons.METRICS_KEY] = metricsDescription
 
-    print(cons.RESULT_FILE)
-    print(json.dumps(data, indent=2, sort_keys=True))
- 
+        gran = input("Granularity of datapoints: ")
+        data[cons.PERIOD_KEY] = gran
 
-    f.seek(0)        
-    json.dump(data, f, indent=4)
-    f.truncate()   
+        f.seek(0)
+        json.dump(data, f, indent=4)
+        f.truncate()
 
-    path = os.getcwd()
+        path = os.getcwd()
 
-    commandString = '@hourly cd ' + path + ' && ' + './run.py'
+        commandString = 'cd ' + path + ' && ' + './run.py'
 
-    print('Almost done! Editing your crontab file... ')
-    username = getpass.getuser()
-    cron = CronTab(user=username)
-    job = cron.new(command=commandString)
-    cron.write()
+        username = getpass.getuser()
+        cron = CronTab(user=username)
+        job = cron.new(command=commandString)
+        job.minute.every(3)
+        cron.write()
 
+        commandFiles = 'cd ' + path + ' && ' + './send_files.py'
+        cron = CronTab(user=username)
+        job = cron.new(command=commandFiles)
+        job.minute.every(5)
+        cron.write()
 
-  else:
-    print('to-do')
-    ## te vira e roda o comando xD
+    else:
+        print('to-do')
+        # te vira e roda o comando xD
