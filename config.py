@@ -14,45 +14,37 @@ def getMetricDescription():
 
     while ans == '1':
         metricName = input("Metric name:  ")
-        namespace = input('\n Namespace: ')
-        newDescription = {'metricName': metricName, 'namespace': namespace}
+        namespace = input('\nNamespace: ')
+        newDescription = {cons.METRIC_NAME_KEY: metricName,
+                          cons.NAMESPACE_KEY: namespace}
         descriptions.append(newDescription)
         print(descriptions)
         ans = input(cons.ASK_FOR_NEW_METRIC)
     return descriptions
 
 
-with open('config.json', 'r+') as f:
+with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
-    ans = input(cons.ASK_FOR_COLLECT_TYPE)
 
-    if(ans == '1'):
-        metricsDescription = getMetricDescription()
-        data[cons.METRICS_KEY] = metricsDescription
+    metricsDescription = getMetricDescription()
+    data[cons.METRICS_KEY] = metricsDescription
+    gran = input(cons.GRANURALITY)
+    data[cons.PERIOD_KEY] = gran
 
-        gran = input("Granularity of datapoints: ")
-        data[cons.PERIOD_KEY] = gran
+    print(cons.INFO_INSTANCES)
+    f.seek(0)
+    json.dump(data, f, indent=4)
+    f.truncate()
 
-        f.seek(0)
-        json.dump(data, f, indent=4)
-        f.truncate()
+    path = os.getcwd()
 
-        path = os.getcwd()
+    commandString = 'cd ' + path + ' && ' + './run.py'
+    commandFiles = 'cd ' + path + ' && ' + './send_files.py'
 
-        commandString = 'cd ' + path + ' && ' + './run.py'
-
-        username = getpass.getuser()
-        cron = CronTab(user=username)
-        job = cron.new(command=commandString)
-        job.minute.every(3)
-        cron.write()
-
-        commandFiles = 'cd ' + path + ' && ' + './send_files.py'
-        cron = CronTab(user=username)
-        job = cron.new(command=commandFiles)
-        job.minute.every(5)
-        cron.write()
-
-    else:
-        print('to-do')
-        # te vira e roda o comando xD
+    username = getpass.getuser()
+    cron = CronTab(user=username)
+    jobCollect = cron.new(command=commandString)
+    jobSendFiles = cron.new(command=commandFiles)
+    jobCollect.hour.every(cons.FREQUENCY_COLLECTOR)
+    jobSendFiles.hour.every(cons.FREQUENCY_S3)
+    cron.write()

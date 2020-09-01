@@ -1,5 +1,3 @@
-import os
-from string import Template
 import constants as cons
 import boto3
 import dateutil.parser
@@ -7,7 +5,6 @@ import datetime
 from dateutil.tz import tzlocal
 from process_data.process import joinMetrics
 from log.setup import setup_log
-import pandas as pd
 import json
 
 
@@ -21,22 +18,23 @@ class CollectorAgentWithBoto:
 
     def getMetrics(self):
         logger = setup_log()
-        try:
 
+        try:
             client = boto3.client('cloudwatch')
             metricsList = []
         except Exception as e:
-            logger.error('Connection with cloudwatch using boto has failed')
+            logger.error(
+                cons.ERROR_BOTO_CONNECTION, e.__class__)
 
         for metric in self.metrics:
             for instance in self.instanceDescription:
                 try:
                     response = client.get_metric_statistics(
-                        Namespace=metric['namespace'],
-                        MetricName=metric['metricName'],
+                        Namespace=metric[cons.NAMESPACE_KEY],
+                        MetricName=metric[cons.METRIC_NAME_KEY],
                         Dimensions=[
                             {
-                                "Name": "InstanceId",
+                                "Name": cons.INSTANCE_ID_KEY,
                                 "Value": instance[0]['id']
                             },
                         ],
@@ -47,10 +45,9 @@ class CollectorAgentWithBoto:
                     )
 
                     joinMetrics(
-                        response, instance[0]['id'], metric['metricName'])
+                        response, instance[0]['id'], metric[cons.METRIC_NAME_KEY])
 
                 except Exception as e:
                     logger.error('Something went wrong. Metric:  %s, Instance: %s, Error: %s',
-                                 metric['metricName'], instance[0]['id'], e.__class__)
-                    print("Oops!", e.__class__, "occurred.")
-        logger.info('End of metrics collection')
+                                 metric[cons.METRIC_NAME_KEY], instance[0]['id'], e.__class__)
+        logger.info(cons.END_COLLECTOR)
