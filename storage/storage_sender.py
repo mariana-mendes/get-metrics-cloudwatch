@@ -35,3 +35,19 @@ class Uploader:
                 logging.error(e)
                 return False
         return True
+
+    def createBucket(self, bucket_name):
+        if alreadyExist(bucket_name):
+            return False
+        
+        try:
+            session = boto3.session.Session()
+            current_region = session.region_name
+            bucket_response = s3_connection.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={
+                'LocationConstraint': current_region})
+        except ClientError as e:
+            logging.error(e)
+            return False
+        return True
