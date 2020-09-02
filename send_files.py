@@ -4,6 +4,17 @@ from datetime import date
 from log.setup import setup_log
 import boto3
 import constants as cons
+import tarfile
+import os
+
+
+def compress_file():
+    today_file = date.today().strftime("%Y-%m-%d")
+    tar = tarfile.open(today_file + ".tar.gz", mode="w:gz")
+    file_name = './'+today_file+'.csv'
+    print(os.path.basename(file_name))
+    tar.add(file_name, os.path.basename(file_name))
+    tar.close()
 
 
 def send_file():
@@ -11,10 +22,11 @@ def send_file():
     logger.info(cons.STARTING_SEND_FILES)
     today_file = date.today().strftime("%Y-%m-%d")
 
+    compress_file()
     try:
         client = boto3.client('s3')
         response = client.put_object(
-            Body=(open('./'+today_file+'.csv', 'rb')),
+            Body=(open('./'+today_file+'.tar.gz', 'rb')),
             Bucket='log-ec2-instance',
             Key=today_file,
         )
