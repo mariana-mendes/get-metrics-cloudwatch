@@ -12,7 +12,6 @@ def compress_file():
     today_file = date.today().strftime("%Y-%m-%d")
     tar = tarfile.open(today_file + ".tar.gz", mode="w:gz")
     file_name = './'+today_file+'.csv'
-    print(os.path.basename(file_name))
     tar.add(file_name, os.path.basename(file_name))
     tar.close()
 
