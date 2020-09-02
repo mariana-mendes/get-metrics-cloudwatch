@@ -16,5 +16,4 @@ ERROR_BOTO_CONNECTION = "Connection with cloudwatch using boto has failed"
 GRANURALITY = "Granularity of datapoints:  "
 INFO_INSTANCES = "The description of the instances will be collected automatically."
 FREQUENCY_COLLECTOR = 3
-FREQUENCY_S3 = 4
 STARTING_SEND_FILES = "Initializing transfer data to s3 bucket"

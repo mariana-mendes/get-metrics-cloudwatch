@@ -6,20 +6,22 @@ import boto3
 import constants as cons
 
 
-logger = setup_log()
-logger.info(cons.STARTING_SEND_FILES)
-today_file = date.today().strftime("%Y-%m-%d")
+def send_file():
+    logger = setup_log()
+    logger.info(cons.STARTING_SEND_FILES)
+    today_file = date.today().strftime("%Y-%m-%d")
 
-try:
-    client = boto3.client('s3')
-    response = client.put_object(
-        Body=(open('./'+today_file+'.csv', 'rb')),
-        Bucket='log-ec2-instance',
-        Key=today_file,
-    )
-except Exception as e:
-    logger.error("Something went wrong trying to send files: %s", e.__class__)
-    response = {'ResponseMetadata': {'HTTPStatusCode': 404}}
+    try:
+        client = boto3.client('s3')
+        response = client.put_object(
+            Body=(open('./'+today_file+'.csv', 'rb')),
+            Bucket='log-ec2-instance',
+            Key=today_file,
+        )
+    except Exception as e:
+        logger.error(
+            "Something went wrong trying to send files: %s", e.__class__)
+        response = {'ResponseMetadata': {'HTTPStatusCode': 404}}
 
-logger.info("Finishing data send to s3 bucket. Status: %s",
-            response['ResponseMetadata']['HTTPStatusCode'])
+    logger.info("Finishing data send to s3 bucket. Status: %s",
+                response['ResponseMetadata']['HTTPStatusCode'])

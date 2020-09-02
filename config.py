@@ -39,12 +39,9 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     path = os.getcwd()
 
     commandString = 'cd ' + path + ' && ' + './run.py'
-    commandFiles = 'cd ' + path + ' && ' + './send_files.py'
 
     username = getpass.getuser()
     cron = CronTab(user=username)
     jobCollect = cron.new(command=commandString)
-    jobSendFiles = cron.new(command=commandFiles)
-    jobCollect.hour.every(cons.FREQUENCY_COLLECTOR)
-    jobSendFiles.hour.every(cons.FREQUENCY_S3)
+    jobCollect.every(cons.FREQUENCY_COLLECTOR).hours()
     cron.write()

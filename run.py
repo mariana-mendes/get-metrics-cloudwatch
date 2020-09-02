@@ -7,6 +7,7 @@ import constants as cons
 from datetime import datetime, timedelta
 from collector.collector_boto import CollectorAgentWithBoto as CWB
 from log.setup import setup_log
+from send_files import send_file
 
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
@@ -33,3 +34,4 @@ collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION],
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
 collcWithBoto.getMetrics()
+send_file()
