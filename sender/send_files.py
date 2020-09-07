@@ -12,18 +12,18 @@ class Sender:
         self.client = boto3.client('s3')
         self.file_to_send = file_to_send
 
-    def compress_file():
+    def compress_file(self):
         tar = tarfile.open(self.file_to_send + ".tar.gz", mode="w:gz")
-        tar.add(self.file_to_send, os.path.basename(self.file_to_send))
+        tar.add(self.file_to_send + ".csv", os.path.basename(self.file_to_send + ".csv"))
         tar.close()
 
-    def send_files():
+    def send_files(self):
         self.logger.info(cons.STARTING_SEND_FILES)
-        compress_file()
+        self.compress_file()
         try:
             response = self.client.put_object(
                 Body=(open(self.file_to_send+'.tar.gz', 'rb')),
-                Bucket='log-ec2-instance',
+                Bucket='log-ec2-instance/log',
                 Key=self.file_to_send,
             )
         except Exception as e:

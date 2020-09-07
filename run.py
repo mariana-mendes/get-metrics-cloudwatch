@@ -4,15 +4,14 @@ import os
 import sys
 import json
 import constants as cons
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from collector.collector_boto import CollectorAgentWithBoto as CWB
 from sender.send_files import Sender as sender
 from log.setup import setup_log
-
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
 
-    # os.system(cons.GET_INSTANCES_IDS)
+    os.system(cons.GET_INSTANCES_IDS)
 
     with open(cons.INSTANCES_FILE, 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
@@ -24,7 +23,7 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.END_TIME_KEY] = endTime
         data[cons.START_TIME_KEY] = startTime
 
-    # os.system(cons.GET_AUTOSCALING_GROUPS)
+    os.system(cons.GET_AUTOSCALING_GROUPS)
     with open(cons.GROUPS_FILE, 'r+') as groupsFile:
         names = []
         dataGroups = json.load(groupsFile)["AutoScalingGroups"]
