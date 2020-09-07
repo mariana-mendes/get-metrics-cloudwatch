@@ -30,7 +30,7 @@ def joinMetricsEC2(response, idInstance, metricName):
         'avg': average
     }
     newDf = pd.DataFrame(data=newDict)
-    today_file = date.today().strftime("%Y-%m-%d")
+    today_file = "ec2-" + date.today().strftime("%Y-%m-%d")
 
     if(os.path.exists(today_file + '.csv')):
         dtf = pd.read_csv(today_file + '.csv', index_col=0)
@@ -41,4 +41,37 @@ def joinMetricsEC2(response, idInstance, metricName):
 
 
 def joinMetricsASG(response, groupName, metricName):
-    print(response)
+    datapoints = response["Datapoints"]
+    totalRows = len(datapoints)
+    metricColumn = [metricName] * totalRows
+    idColumn = [groupName] * totalRows
+
+    time = []
+    maximum = []
+    minimum = []
+    average = []
+
+    for dtp in datapoints:
+        dt = (dtp['Timestamp']).replace(tzinfo=None)
+        time.append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
+        maximum.append(dtp['Maximum'])
+        minimum.append(dtp['Minimum'])
+        average.append(dtp['Average'])
+
+    newDict = {
+        'timestamp': time,
+        'groupName': idColumn,
+        'metric': metricColumn,
+        'max': maximum,
+        'min': minimum,
+        'avg': average
+    }
+    newDf = pd.DataFrame(data=newDict)
+    today_file = "asg-" + date.today().strftime("%Y-%m-%d")
+
+    if(os.path.exists(today_file + '.csv')):
+        dtf = pd.read_csv(today_file + '.csv', index_col=0)
+        newOne = dtf.append(newDf, ignore_index=True)
+        newOne.to_csv(today_file + ".csv")
+    else:
+        newDf.to_csv(today_file + ".csv")

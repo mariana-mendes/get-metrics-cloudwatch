@@ -6,13 +6,13 @@ import json
 import constants as cons
 from datetime import datetime, timedelta
 from collector.collector_boto import CollectorAgentWithBoto as CWB
+from sender.send_files import Sender as sender
 from log.setup import setup_log
-from send_files import send_file
 
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
 
-    os.system(cons.GET_INSTANCES_IDS)
+    # os.system(cons.GET_INSTANCES_IDS)
 
     with open(cons.INSTANCES_FILE, 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
@@ -24,8 +24,8 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.END_TIME_KEY] = endTime
         data[cons.START_TIME_KEY] = startTime
 
+    # os.system(cons.GET_AUTOSCALING_GROUPS)
     with open(cons.GROUPS_FILE, 'r+') as groupsFile:
-
         names = []
         dataGroups = json.load(groupsFile)["AutoScalingGroups"]
         for group in dataGroups:
@@ -37,10 +37,18 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     f.truncate()
 
 
-collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION],
+collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION], data[cons.GROUPS_DESCRIPTION],
                     data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
+
+# pegar nomes dos arquivos
+today_file_ec2 = "ec2-" + date.today().strftime("%Y-%m-%d")
+today_file_asg = "asg-" + date.today().strftime("%Y-%m-%d")
+
+senderEC2 = sender(today_file_ec2)
+senderASG = sender(today_file_asg)
 
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
 collcWithBoto.getMetrics()
-send_file()
+senderEC2.send_files()
+senderASG.send_files()

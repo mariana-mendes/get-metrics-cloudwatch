@@ -16,15 +16,15 @@ class CollectorAgentWithBoto:
         self.start = start
         self.end = end
         self.period = period
-        self.client = boto3.client('cloudwatch', region_name=aws_region)
+        self.client = boto3.client('cloudwatch')
         self.logger = setup_log()
 
     def getMetrics(self):
         for metric in self.metrics:
             if(metric[cons.NAMESPACE_KEY] == "AWS/EC2"):
-                self.getMetricsEC2(self, metric)
+                self.getMetricsEC2(metric)
             elif(metric[cons.NAMESPACE_KEY] == "AWS/AutoScaling"):
-                self.getMetricsAutoScaling(self, metric)
+                self.getMetricsAutoScaling(metric)
 
     def getMetricsEC2(self, metric):
         for instance in self.instanceDescription:
