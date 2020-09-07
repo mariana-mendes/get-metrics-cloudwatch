@@ -27,52 +27,52 @@ class CollectorAgentWithBoto:
                 self.getMetricsAutoScaling(self, metric)
 
     def getMetricsEC2(self, metric):
-            for instance in self.instanceDescription:
-                try:
-                    response = self.client.get_metric_statistics(
-                        Namespace=metric[cons.NAMESPACE_KEY],
-                        MetricName=metric[cons.METRIC_NAME_KEY],
-                        Dimensions=[
-                            {
-                                "Name": cons.INSTANCE_ID_KEY,
-                                "Value": instance[0]['id']
-                            },
-                        ],
-                        StartTime=dateutil.parser.isoparse(self.start),
-                        EndTime=dateutil.parser.isoparse(self.end),
-                        Period=int(self.period),
-                        Statistics=['Average', 'Minimum', 'Maximum'],
-                    )
-                    joinMetricsEC2(
-                        response, instance[0]['id'], metric[cons.METRIC_NAME_KEY])
+        for instance in self.instanceDescription:
+            try:
+                response = self.client.get_metric_statistics(
+                    Namespace=metric[cons.NAMESPACE_KEY],
+                    MetricName=metric[cons.METRIC_NAME_KEY],
+                    Dimensions=[
+                        {
+                            "Name": cons.INSTANCE_ID_KEY,
+                            "Value": instance[0]['id']
+                        },
+                    ],
+                    StartTime=dateutil.parser.isoparse(self.start),
+                    EndTime=dateutil.parser.isoparse(self.end),
+                    Period=int(self.period),
+                    Statistics=['Average', 'Minimum', 'Maximum'],
+                )
+                joinMetricsEC2(
+                    response, instance[0]['id'], metric[cons.METRIC_NAME_KEY])
 
-                except Exception as e:
-                    self.logger.error('Something went wrong. Metric:  %s, Instance: %s, Error: %s',
-                                      metric[cons.METRIC_NAME_KEY], instance[0]['id'], e.__class__)
+            except Exception as e:
+                self.logger.error('Something went wrong. Metric:  %s, Instance: %s, Error: %s',
+                                  metric[cons.METRIC_NAME_KEY], instance[0]['id'], e.__class__)
         self.logger.info(cons.END_COLLECTOR)
 
     def getMetricsAutoScaling(self, metric):
-            for groupName in self.groupNames:
-                try:
-                    response = self.client.get_metric_statistics(
-                        Namespace=metric[cons.NAMESPACE_KEY],
-                        MetricName=metric[cons.METRIC_NAME_KEY],
-                        Dimensions=[
-                            {
-                                "Name": cons.AUTOSCALINGGROUP_ID_KEY,
-                                "Value": groupName
-                            },
-                        ],
-                        StartTime=dateutil.parser.isoparse(self.start),
-                        EndTime=dateutil.parser.isoparse(self.end),
-                        Period=int(self.period),
-                        Statistics=['Average', 'Minimum', 'Maximum'],
-                    )
+        for groupName in self.groupNames:
+            try:
+                response = self.client.get_metric_statistics(
+                    Namespace=metric[cons.NAMESPACE_KEY],
+                    MetricName=metric[cons.METRIC_NAME_KEY],
+                    Dimensions=[
+                        {
+                            "Name": cons.AUTOSCALINGGROUP_ID_KEY,
+                            "Value": groupName
+                        },
+                    ],
+                    StartTime=dateutil.parser.isoparse(self.start),
+                    EndTime=dateutil.parser.isoparse(self.end),
+                    Period=int(self.period),
+                    Statistics=['Average', 'Minimum', 'Maximum'],
+                )
 
-                    joinMetricsASG(
-                        response, groupName, metric[cons.METRIC_NAME_KEY])
+                joinMetricsASG(
+                    response, groupName, metric[cons.METRIC_NAME_KEY])
 
-                except Exception as e:
-                    self.logger.error('Something went wrong. Metric:  %s, Group: %s, Error: %s',
-                                 metric[cons.METRIC_NAME_KEY],groupName, e.__class__)
+            except Exception as e:
+                self.logger.error('Something went wrong. Metric:  %s, Group: %s, Error: %s',
+                                  metric[cons.METRIC_NAME_KEY], groupName, e.__class__)
         self.logger.info(cons.END_COLLECTOR)
