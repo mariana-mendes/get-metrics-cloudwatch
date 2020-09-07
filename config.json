@@ -1,8 +1,10 @@
 {
-  "metricsDescription": [],
-  "instancesDescription": [],
-  "autoScalingGroupsDescription": [],
-  "endTime": "",
-  "period": "",
-  "startTime": ""
+    "metricsDescription": [],
+    "instancesDescription": [],
+    "autoScalingGroupsDescription": [
+        "misfits"
+    ],
+    "endTime": "2020-09-07T21:24:01.604237",
+    "period": "",
+    "startTime": "2020-09-07T18:24:01.604243"
 }

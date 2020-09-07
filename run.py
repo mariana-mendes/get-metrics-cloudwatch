@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, date
 from collector.collector_boto import CollectorAgentWithBoto as CWB
 from sender.send_files import Sender as sender
 from log.setup import setup_log
+
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
 
@@ -35,19 +36,13 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     json.dump(data, f, indent=4)
     f.truncate()
 
-
 collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION], data[cons.GROUPS_DESCRIPTION],
                     data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
 
-# pegar nomes dos arquivos
-today_file_ec2 = "ec2-" + date.today().strftime("%Y-%m-%d")
-today_file_asg = "asg-" + date.today().strftime("%Y-%m-%d")
 
-senderEC2 = sender(today_file_ec2)
-senderASG = sender(today_file_asg)
+sender = sender()
 
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
 collcWithBoto.getMetrics()
-senderEC2.send_files()
-senderASG.send_files()
+sender.send_files()
