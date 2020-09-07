@@ -2,7 +2,8 @@ import pandas as pd
 import os.path
 from datetime import date
 
-def joinMetrics(response, idInstance, metricName):
+
+def joinMetricsEC2(response, idInstance, metricName):
     datapoints = response["Datapoints"]
     totalRows = len(datapoints)
     metricColumn = [metricName] * totalRows
@@ -37,3 +38,7 @@ def joinMetrics(response, idInstance, metricName):
         newOne.to_csv(today_file + ".csv")
     else:
         newDf.to_csv(today_file + ".csv")
+
+
+def joinMetricsASG(response, groupName, metricName):
+    print(response)

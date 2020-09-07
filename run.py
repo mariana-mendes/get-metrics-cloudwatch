@@ -24,9 +24,18 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.END_TIME_KEY] = endTime
         data[cons.START_TIME_KEY] = startTime
 
+    with open(cons.GROUPS_FILE, 'r+') as groupsFile:
+
+        names = []
+        dataGroups = json.load(groupsFile)["AutoScalingGroups"]
+        for group in dataGroups:
+            names.append(group["AutoScalingGroupName"])
+        data[cons.GROUPS_DESCRIPTION] = names
+
     f.seek(0)
     json.dump(data, f, indent=4)
     f.truncate()
+
 
 collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION],
                     data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
