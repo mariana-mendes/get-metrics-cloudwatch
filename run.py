@@ -44,5 +44,5 @@ sender = sender()
 
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
-collcWithBoto.getMetrics()
+# collcWithBoto.getMetrics()
 sender.send_files()

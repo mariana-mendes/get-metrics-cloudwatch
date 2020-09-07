@@ -10,14 +10,15 @@ class Sender:
     def __init__(self):
         self.logger = setup_log()
         self.client = boto3.client('s3')
-        self.file_to_send = file_to_send
-
+        
     def compress_files(self):
-        print(os.path.basename(self.file_to_send + ".csv"))
-        # tar = tarfile.open(self.file_to_send + ".tar.gz", mode="w:gz")
-        # tar.add(self.file_to_send + ".csv",
-        #         os.path.basename(self.file_to_send + ".csv"))
-        # tar.close()
+        dirData = os.getcwd() + "/data/"
+        for folder in os.listdir(dirData):
+            for fileName in os.listdir(dirData + folder):
+                print(dirData + folder)
+                tar = tarfile.open("a.tar.gz", mode="w:gz")
+                tar.add(dirData + folder+"/", os.path.basename(dirData + folder + "/"))
+                tar.close()
 
     def send_files(self):
         self.logger.info(cons.STARTING_SEND_FILES)
