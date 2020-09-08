@@ -42,5 +42,4 @@ class Sender:
                 "Something went wrong trying to send files: %s", e.__class__)
             response = {'ResponseMetadata': {'HTTPStatusCode': 404}}
 
-        # self.logger.info("Finishing data send to s3 bucket. Status: %s",
-        #                  response['ResponseMetadata']['HTTPStatusCode'])
+        self.logger.info("Finishing data send to s3 bucket.")
