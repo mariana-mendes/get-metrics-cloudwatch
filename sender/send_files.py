@@ -29,18 +29,18 @@ class Sender:
         try:
             dirData = os.getcwd() + "/data/"
             for folder in os.listdir(dirData):
-            pathName = dirData + folder
-            for fileName in os.listdir(pathName):
-                if fileName.endswith("tar.gz"):
-                    response = self.client.put_object(
-                        Body=(open(fileName, 'rb')),
-                        Bucket='log-ec2-instance/log',
-                        Key=self.file_to_send,
-                    )
+                pathName = dirData + folder
+                for fileName in os.listdir(pathName):
+                    if fileName.endswith("tar.gz"):
+                        response = self.client.put_object(
+                            Body=(open(fileName, 'rb')),
+                            Bucket='log-ec2-instance/log',
+                            Key=self.file_to_send,
+                        )
         except Exception as e:
             self.logger.error(
-                "Something went wrong trying to send files: %s", e.__class__, e.)
+                "Something went wrong trying to send files: %s", e.__class__)
             response = {'ResponseMetadata': {'HTTPStatusCode': 404}}
 
-        self.logger.info("Finishing data send to s3 bucket. Status: %s",
-                         response['ResponseMetadata']['HTTPStatusCode'])
+        # self.logger.info("Finishing data send to s3 bucket. Status: %s",
+        #                  response['ResponseMetadata']['HTTPStatusCode'])
