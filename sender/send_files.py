@@ -11,32 +11,30 @@ class Sender:
         self.logger = setup_log()
         self.client = boto3.client('s3')
 
-    def compress_files(self):
-        dirData = os.getcwd() + "/data/"
-        for folder in os.listdir(dirData):
-            pathName = dirData + folder
-            for fileName in os.listdir(pathName):
-                os.chdir(pathName)
-                fileNameBase = os.path.splitext(fileName)[0]
-                tar = tarfile.open(fileNameBase + ".tar.gz", mode="w:gz")
-                tar.add(pathName + "/" + fileName,
+    def compress_file(self, fileName, pathName):
+        os.chdir(pathName)
+        fileNameBase = os.path.splitext(fileName)[0] + ".tar.gz"
+        with tarfile.open(fileNameBase, 'w:gz') as newFile:
+            newFile.add(pathName + "/" + fileName,
                         arcname=fileName, recursive=False)
-                tar.close()
 
     def send_files(self):
         self.logger.info(cons.STARTING_SEND_FILES)
-        self.compress_files()
+        originalDir = os.getcwd()
+        dirData = os.getcwd() + "/data/"
+
         try:
-            dirData = os.getcwd() + "/data/"
-            for folder in os.listdir(dirData):
-                pathName = dirData + folder
-                for fileName in os.listdir(pathName):
-                    if fileName.endswith("tar.gz"):
-                        response = self.client.put_object(
-                            Body=(open(fileName, 'rb')),
-                            Bucket='log-ec2-instance/log',
-                            Key=self.file_to_send,
-                        )
+            for folderName, subfolders, filenames in os.walk(dirData):
+                for filename in filenames:
+                    filePath = os.path.join(folderName, filename)
+                    if filename.endswith(".csv"):
+                        fileNameBase = os.path.splitext(
+                            filename)[0] + ".tar.gz"
+
+                        self.compress_file(filename, folderName)
+                        self.client.upload_file(
+                            filePath, 'log-ec2-instance', '%s/%s' % ('/log', filename))
+            os.chdir(originalDir)
         except Exception as e:
             self.logger.error(
                 "Something went wrong trying to send files: %s", e.__class__)
