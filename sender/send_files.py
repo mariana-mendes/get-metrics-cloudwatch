@@ -24,17 +24,17 @@ class Sender:
         dirData = os.getcwd() + "/data/"
 
         try:
-            for folderName, subfolders, filenames in os.walk(dirData):
-                for filename in filenames:
-                    filePath = os.path.join(folderName, filename)
-                    if filename.endswith(".csv"):
-                        fileNameBase = os.path.splitext(
-                            filename)[0] + ".tar.gz"
+        for folderName, subfolders, filenames in os.walk(dirData):
+            for filename in filenames:
+                filePath = os.path.join(folderName, filename)
+                if filename.endswith(".csv"):
+                    fileNameBase = os.path.splitext(
+                        filename)[0] + ".tar.gz"
 
-                        self.compress_file(filename, folderName)
-                        self.client.upload_file(
-                            filePath, 'log-ec2-instance', '%s/%s' % ('/log', filename))
-            os.chdir(originalDir)
+                    self.compress_file(filename, folderName)
+                    self.client.upload_file(
+                        folderName + "/"+fileNameBase, 'log-ec2-instance', '%s/%s' % ('log', fileNameBase))
+        os.chdir(originalDir)
         except Exception as e:
             self.logger.error(
                 "Something went wrong trying to send files: %s", e.__class__)
