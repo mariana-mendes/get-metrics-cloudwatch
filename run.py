@@ -5,7 +5,7 @@ import sys
 import json
 import constants as cons
 from datetime import datetime, timedelta, date
-from collector.collector_boto import CollectorAgentWithBoto as CWB
+from collector.collector_boto import CollectorAgent as CWA
 from sender.send_files import Sender as sender
 from log.setup import setup_log
 
@@ -16,7 +16,12 @@ with open(cons.CONFIG_FILE, 'r+') as f:
 
     with open(cons.INSTANCES_FILE, 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
-        data[cons.INSTANCES_DESCRIPTION] = dataInstances
+        instanceIdValues = []
+
+        for instance in dataInstances:
+            instanceIdValues.append(instance[0])
+
+        data[cons.DIMENSIONS_VALUES][cons.INSTANCE_ID_KEY] = instanceIdValues
 
         endTime = datetime.utcnow().isoformat()
         startTime = (datetime.utcnow() -
@@ -25,24 +30,26 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.START_TIME_KEY] = startTime
 
     os.system(cons.GET_AUTOSCALING_GROUPS)
+
     with open(cons.GROUPS_FILE, 'r+') as groupsFile:
         names = []
         dataGroups = json.load(groupsFile)["AutoScalingGroups"]
+
         for group in dataGroups:
-            names.append(group["AutoScalingGroupName"])
-        data[cons.GROUPS_DESCRIPTION] = names
+            names.append(
+                {cons.AUTOSCALINGGROUP_ID_KEY: group[cons.AUTOSCALINGGROUP_ID_KEY]})
+        data[cons.DIMENSIONS_VALUES][cons.AUTOSCALINGGROUP_ID_KEY] = names
 
     f.seek(0)
     json.dump(data, f, indent=4)
     f.truncate()
 
-collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION], data[cons.GROUPS_DESCRIPTION],
-                    data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
+    collector = CWA(data[cons.METRICS_KEY],  data[cons.DIMENSIONS_VALUES],
+                    data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE])
 
 
 sender = sender()
-
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
-collcWithBoto.getMetrics()
+collector.getMetrics()
 sender.send_files()

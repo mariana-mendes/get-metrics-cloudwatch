@@ -3,64 +3,39 @@ import boto3
 import dateutil.parser
 import datetime
 from dateutil.tz import tzlocal
-from process_data.process import joinMetricsEC2, joinMetricsASG
+from process_data.process import joinMetrics
 from log.setup import setup_log
 import json
 
 
-class CollectorAgentWithBoto:
-    def __init__(self, metrics, instanceDescription, groupNames, start, end, period):
+class CollectorAgent:
+    def __init__(self, metrics, dimensionsValues, start, end, period, storage):
         self.metrics = metrics
-        self.instanceDescription = instanceDescription
-        self.groupNames = groupNames
+        self.dimensionsValues = dimensionsValues
         self.start = start
         self.end = end
         self.period = period
         self.client = boto3.client('cloudwatch')
         self.logger = setup_log()
+        self.storage = storage
 
     def getMetrics(self):
         for metric in self.metrics:
-            if(metric[cons.NAMESPACE_KEY] == "AWS/EC2"):
-                self.getMetricsEC2(metric)
-            elif(metric[cons.NAMESPACE_KEY] == "AWS/AutoScaling"):
-                self.getMetricsAutoScaling(metric)
+            self.retrieveFromCloudWatch(metric)
 
-    def getMetricsEC2(self, metric):
-        for instance in self.instanceDescription:
+    def retrieveFromCloudWatch(self, metric):
+        metricDimension = metric["dimension"]
+        valuesDimension = self.dimensionsValues[metricDimension]
+
+        for value in valuesDimension:
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
                     MetricName=metric[cons.METRIC_NAME_KEY],
                     Dimensions=[
                         {
-                            "Name": cons.INSTANCE_ID_KEY,
-                            "Value": instance[0]['id']
-                        },
-                    ],
-                    StartTime=dateutil.parser.isoparse(self.start),
-                    EndTime=dateutil.parser.isoparse(self.end),
-                    Period=int(self.period),
-                    Statistics=['Average', 'Minimum', 'Maximum'],
-                )
-                joinMetricsEC2(
-                    response, instance[0]['id'], metric[cons.METRIC_NAME_KEY])
-
-            except Exception as e:
-                self.logger.error('Something went wrong. Metric:  %s, Instance: %s, Error: %s',
-                                  metric[cons.METRIC_NAME_KEY], instance[0]['id'], e.__class__)
-        self.logger.info(cons.END_COLLECTOR)
-
-    def getMetricsAutoScaling(self, metric):
-        for groupName in self.groupNames:
-            try:
-                response = self.client.get_metric_statistics(
-                    Namespace=metric[cons.NAMESPACE_KEY],
-                    MetricName=metric[cons.METRIC_NAME_KEY],
-                    Dimensions=[
-                        {
-                            "Name": cons.AUTOSCALINGGROUP_ID_KEY,
-                            "Value": groupName
+                            "Name": metricDimension,
+                            "Value": value
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
@@ -69,10 +44,10 @@ class CollectorAgentWithBoto:
                     Statistics=['Average', 'Minimum', 'Maximum'],
                 )
 
-                joinMetricsASG(
-                    response, groupName, metric[cons.METRIC_NAME_KEY])
+                joinMetrics(
+                    response, value[metricDimension], metric[cons.METRIC_NAME_KEY], self.storage[metricDimension])
 
             except Exception as e:
-                self.logger.error('Something went wrong. Metric:  %s, Group: %s, Error: %s',
-                                  metric[cons.METRIC_NAME_KEY], groupName, e.__class__)
+                self.logger.error('Something went wrong. Metric:  %s, Value: %s, Error: %s',
+                                  metric[cons.METRIC_NAME_KEY], value, e.__class__)
         self.logger.info(cons.END_COLLECTOR)

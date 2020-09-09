@@ -10,6 +10,7 @@ class Sender:
     def __init__(self):
         self.logger = setup_log()
         self.client = boto3.client('s3')
+        self.buckets = self.client.list_buckets()['Buckets']
 
     def compress_file(self, fileName, pathName):
         os.chdir(pathName)
@@ -30,7 +31,6 @@ class Sender:
                     if filename.endswith(".csv"):
                         fileNameBase = os.path.splitext(
                             filename)[0] + ".tar.gz"
-
                         self.compress_file(filename, folderName)
                         self.client.upload_file(
                             folderName + "/"+fileNameBase, 'log-ec2-instance', '%s/%s' % ('log', fileNameBase))
