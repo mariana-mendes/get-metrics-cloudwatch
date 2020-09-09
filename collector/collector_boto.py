@@ -35,7 +35,7 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": value
+                            "Value": value[metricDimension]
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),

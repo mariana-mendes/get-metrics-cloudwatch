@@ -29,15 +29,16 @@ class Sender:
                 for filename in filenames:
                     filePath = os.path.join(folderName, filename)
                     if filename.endswith(".csv"):
-                        fileNameBase = os.path.splitext(
+                        folderS3 = folderName.split("/")[-1])
+                        fileNameBase=os.path.splitext(
                             filename)[0] + ".tar.gz"
                         self.compress_file(filename, folderName)
                         self.client.upload_file(
-                            folderName + "/"+fileNameBase, 'log-ec2-instance', '%s/%s' % ('log', fileNameBase))
+                            folderName + "/"+fileNameBase, 'log-ec2-instance', '%s/%s' % (folderS3, fileNameBase))
             os.chdir(originalDir)
         except Exception as e:
             self.logger.error(
                 "Something went wrong trying to send files: %s", e.__class__)
-            response = {'ResponseMetadata': {'HTTPStatusCode': 404}}
+            response={'ResponseMetadata': {'HTTPStatusCode': 404}}
 
         self.logger.info("Finishing data send to s3 bucket.")
