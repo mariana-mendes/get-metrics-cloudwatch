@@ -45,7 +45,7 @@ class CollectorAgent:
                 )
 
                 joinMetrics(
-                    response, value[metricDimension], metric[cons.METRIC_NAME_KEY], self.storage[metricDimension])
+                    response, metric, metricDimension, value, self.storage[metricDimension])
 
             except Exception as e:
                 self.logger.error('Something went wrong. Metric:  %s, Value: %s, Error: %s',

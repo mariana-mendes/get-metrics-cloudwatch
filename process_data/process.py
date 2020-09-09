@@ -5,13 +5,14 @@ from log.setup import setup_log
 import constants as cons
 
 
-def joinMetrics(response, idValue, metricName, folderName):
+def joinMetrics(response, metric, metricDimension, value, folderName):
     logger = setup_log()
     datapoints = response[cons.DATAPOINTS_KEY]
     totalRows = len(datapoints)
-    metricColumn = [metricName] * totalRows
-    idColumn = [idValue] * totalRows
-    print(idValue)
+    metricColumn = [metric[cons.METRIC_NAME_KEY]] * totalRows
+    dimension = metric[cons.DIMENSION_KEY]
+
+    idColumn = [value[metricDimension]] * totalRows
 
     time = []
     maximum = []
@@ -27,12 +28,13 @@ def joinMetrics(response, idValue, metricName, folderName):
 
     newDict = {
         'timestamp': time,
-        idValue: idColumn,
+        dimension: idColumn,
         'metric': metricColumn,
         'max': maximum,
         'min': minimum,
         'avg': average
     }
+
     newDf = pd.DataFrame(data=newDict)
     today_file = date.today().strftime("%Y-%m-%d")
 
