@@ -39,12 +39,13 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
     today_file = date.today().strftime("%Y-%m-%d")
 
     path = os.getcwd() + "/data/" + folderName + "/" + today_file + ".csv"
-    try:
-        if(os.path.exists(path)):
-            dtf = pd.read_csv(path, index_col=0)
-            newOne = dtf.append(newDf, ignore_index=True)
-            newOne.to_csv(path)
-        else:
-            newDf.to_csv(path)
-    except Exception as e:
-        logger.error("Erro ao criar arquivos", e.__class__)
+    if(not newDf.empty):
+        try:
+            if(os.path.exists(path)):
+                dtf = pd.read_csv(path, index_col=0)
+                newOne = dtf.append(newDf, ignore_index=True)
+                newOne.to_csv(path)
+            else:
+                newDf.to_csv(path)
+        except Exception as e:
+            logger.error("Erro ao criar arquivos", e.__class__)
