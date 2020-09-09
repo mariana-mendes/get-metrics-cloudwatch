@@ -29,12 +29,11 @@ class Sender:
                 for filename in filenames:
                     filePath = os.path.join(folderName, filename)
                     if filename.endswith(".csv"):
-                        folderS3 = folderName.split("/")[-1])
+                        folderS3 = folderName.split("/")[-1]
                         fileNameBase=os.path.splitext(
                             filename)[0] + ".tar.gz"
                         self.compress_file(filename, folderName)
-                        self.client.upload_file(
-                            folderName + "/"+fileNameBase, 'log-ec2-instance', '%s/%s' % (folderS3, fileNameBase))
+                        response = self.client.upload_file(folderName + "/" + fileNameBase, 'log-ec2-instance', folderS3+'/{}'.format(fileNameBase))
             os.chdir(originalDir)
         except Exception as e:
             self.logger.error(
