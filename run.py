@@ -6,13 +6,14 @@ import json
 import constants as cons
 from datetime import datetime, timedelta, date
 from collector.collector_boto import CollectorAgent as CWA
+from aws.API import API as api
 from sender.send_files import Sender as sender
 from log.setup import setup_log
 
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
 
-    os.system(cons.GET_INSTANCES_IDS)
+    # os.system(cons.GET_INSTANCES_IDS)
 
     with open(cons.INSTANCES_FILE, 'r+') as instancesFile:
         dataInstances = json.load(instancesFile)
@@ -29,7 +30,7 @@ with open(cons.CONFIG_FILE, 'r+') as f:
         data[cons.END_TIME_KEY] = endTime
         data[cons.START_TIME_KEY] = startTime
 
-    os.system(cons.GET_AUTOSCALING_GROUPS)
+    # os.system(cons.GET_AUTOSCALING_GROUPS)
 
     with open(cons.GROUPS_FILE, 'r+') as groupsFile:
         names = []
@@ -44,12 +45,15 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     json.dump(data, f, indent=4)
     f.truncate()
 
-    collector = CWA(data[cons.METRICS_KEY],  data[cons.DIMENSIONS_VALUES],
-                    data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE])
+    # collector = CWA(data[cons.METRICS_KEY],  data[cons.DIMENSIONS_VALUES],
+    #                 data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE])
 
+    cwapi = api()
 
-sender = sender()
-logger = setup_log()
-logger.info(cons.STARTING_COLLECTOR)
-collector.getMetrics()
-sender.send_files()
+    api.describeInstances()
+
+# sender = sender()
+# logger = setup_log()
+# logger.info(cons.STARTING_COLLECTOR)
+# collector.getMetrics()
+# sender.send_files()
