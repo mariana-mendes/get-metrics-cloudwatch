@@ -1,15 +1,15 @@
 {
     "metricsDescription": [
         {
-            "metricName": "GroupTotalInstances",
-            "namespace": "AWS/AutoScaling",
-            "dimension": "AutoScalingGroupName"
+            "metricName": "RequestCount",
+            "namespace": "AWS/ApplicationELB",
+            "dimension": "LoadBalancer"
         }
     ],
-    "endTime": "2020-09-10T17:14:30.265660",
+    "endTime": "2020-09-10T18:32:46.419433",
     "period": "300",
     "startTime": "2020-09-10T13:56:30.844386",
     "storage": {
-        "AutoScalingGroupName": "asg"
+        "LoadBalancer": "elb"
     }
 }

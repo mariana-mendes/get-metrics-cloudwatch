@@ -46,15 +46,20 @@ class CollectorAgent:
                 )
 
                 joinMetrics(
-                    response, metric, metricDimension, value, self.storage[metricDimension])
-
+                joinMetrics(response, metric, metricDimension, value,
+                            self.storage[metricDimension])
             except Exception as e:
                 self.logger.error('Something went wrong. Metric:  %s, Value: %s, Error: %s',
-                                  metric[cons.METRIC_NAME_KEY], value, e.__class__)
-        self.logger.info(cons.END_COLLECTOR)
+                self.logger.error(
+                    'Something went wrong. Metric:  %s, Value: %s, Error: %s',
+                    metric[cons.METRIC_NAME_KEY], value, e.__class__)
 
+    ''' Return list of values (ids, unique names, etc) from a specific dimension.'''
     def getDimensionValues(self,dimension):
-        if(dimension == "InstanceId"):
-            return self.api.describeInstances()
+
+    def getDimensionValues(self, dimension):
+        if (dimension == "InstanceId"):
         elif(dimension == "AutoScalingGroupName"):
-            return self.api.describeAutoScalingGroups()
+        elif (dimension == "AutoScalingGroupName"):
+        elif(dimension == "LoadBalancer"):
+        elif (dimension == "LoadBalancer"):
