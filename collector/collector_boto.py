@@ -6,48 +6,55 @@ from dateutil.tz import tzlocal
 from process_data.process import joinMetrics
 from log.setup import setup_log
 import json
+from aws.API import API as api
 
 
-class CollectorAgentWithBoto:
-    def __init__(self, metrics, instanceDescription, start, end, period):
+class CollectorAgent:
+    def __init__(self, metrics, start, end, period, storage):
         self.metrics = metrics
-        self.instanceDescription = instanceDescription
         self.start = start
         self.end = end
         self.period = period
+        self.client = boto3.client('cloudwatch')
+        self.logger = setup_log()
+        self.storage = storage
+        self.api = api()
 
     def getMetrics(self):
-        logger = setup_log()
-
-        try:
-            client = boto3.client('cloudwatch')
-            metricsList = []
-        except Exception as e:
-            logger.error(
-                cons.ERROR_BOTO_CONNECTION, e.__class__)
-
         for metric in self.metrics:
-            for instance in self.instanceDescription:
-                try:
-                    response = client.get_metric_statistics(
-                        Namespace=metric[cons.NAMESPACE_KEY],
-                        MetricName=metric[cons.METRIC_NAME_KEY],
-                        Dimensions=[
-                            {
-                                "Name": cons.INSTANCE_ID_KEY,
-                                "Value": instance[0]['id']
-                            },
-                        ],
-                        StartTime=dateutil.parser.isoparse(self.start),
-                        EndTime=dateutil.parser.isoparse(self.end),
-                        Period=int(self.period),
-                        Statistics=['Average', 'Minimum', 'Maximum'],
-                    )
+            self.retrieveFromCloudWatch(metric)
 
-                    joinMetrics(
-                        response, instance[0]['id'], metric[cons.METRIC_NAME_KEY])
+    def retrieveFromCloudWatch(self, metric):
+        metricDimension = metric["dimension"]
+        valuesDimension = self.getDimensionValues(metric["dimension"])
 
-                except Exception as e:
-                    logger.error('Something went wrong. Metric:  %s, Instance: %s, Error: %s',
-                                 metric[cons.METRIC_NAME_KEY], instance[0]['id'], e.__class__)
-        logger.info(cons.END_COLLECTOR)
+        for value in valuesDimension:
+            try:
+                response = self.client.get_metric_statistics(
+                    Namespace=metric[cons.NAMESPACE_KEY],
+                    MetricName=metric[cons.METRIC_NAME_KEY],
+                    Dimensions=[
+                        {
+                            "Name": metricDimension,
+                            "Value": value
+                        },
+                    ],
+                    StartTime=dateutil.parser.isoparse(self.start),
+                    EndTime=dateutil.parser.isoparse(self.end),
+                    Period=int(self.period),
+                    Statistics=['Average', 'Minimum', 'Maximum'],
+                )
+
+                joinMetrics(
+                    response, metric, metricDimension, value, self.storage[metricDimension])
+
+            except Exception as e:
+                self.logger.error('Something went wrong. Metric:  %s, Value: %s, Error: %s',
+                                  metric[cons.METRIC_NAME_KEY], value, e.__class__)
+        self.logger.info(cons.END_COLLECTOR)
+
+    def getDimensionValues(self,dimension):
+        if(dimension == "InstanceId"):
+            return self.api.describeInstances()
+        elif(dimension == "AutoScalingGroupName"):
+            return self.api.describeAutoScalingGroups()

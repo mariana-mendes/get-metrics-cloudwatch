@@ -1,37 +1,28 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import json
 import constants as cons
-from datetime import datetime, timedelta
-from collector.collector_boto import CollectorAgentWithBoto as CWB
+from datetime import datetime, timedelta, date
+from collector.collector_boto import CollectorAgent as CWA
+from aws.API import API as api
+from sender.send_files import Sender as sender
 from log.setup import setup_log
-from send_files import send_file
 
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
-
-    os.system(cons.GET_INSTANCES_IDS)
-
-    with open(cons.INSTANCES_FILE, 'r+') as instancesFile:
-        dataInstances = json.load(instancesFile)
-        data[cons.INSTANCES_DESCRIPTION] = dataInstances
-
-        endTime = datetime.utcnow().isoformat()
-        startTime = (datetime.utcnow() -
-                     timedelta(hours=cons.FREQUENCY_COLLECTOR)).isoformat()
-        data[cons.END_TIME_KEY] = endTime
-        data[cons.START_TIME_KEY] = startTime
-
+    endTime = datetime.utcnow().isoformat()
+    startTime = (datetime.utcnow() -
+                  timedelta(hours=cons.FREQUENCY_COLLECTOR)).isoformat()
+    data[cons.END_TIME_KEY] = endTime
     f.seek(0)
     json.dump(data, f, indent=4)
     f.truncate()
 
-collcWithBoto = CWB(data[cons.METRICS_KEY],  data[cons.INSTANCES_DESCRIPTION],
-                    data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY])
+collector = CWA(data[cons.METRICS_KEY],  data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE])
 
+cwapi = api()
+sender = sender()
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
-collcWithBoto.getMetrics()
-send_file()
+collector.getMetrics()
+sender.send_files()

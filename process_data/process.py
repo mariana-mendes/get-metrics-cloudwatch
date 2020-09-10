@@ -1,12 +1,18 @@
 import pandas as pd
 import os.path
 from datetime import date
+from log.setup import setup_log
+import constants as cons
 
-def joinMetrics(response, idInstance, metricName):
-    datapoints = response["Datapoints"]
+
+def joinMetrics(response, metric, metricDimension, value, folderName):
+    logger = setup_log()
+    datapoints = response[cons.DATAPOINTS_KEY]
     totalRows = len(datapoints)
-    metricColumn = [metricName] * totalRows
-    idColumn = [idInstance] * totalRows
+    metricColumn = [metric[cons.METRIC_NAME_KEY]] * totalRows
+    dimension = metric[cons.DIMENSION_KEY]
+
+    idColumn = [value] * totalRows
 
     time = []
     maximum = []
@@ -22,18 +28,24 @@ def joinMetrics(response, idInstance, metricName):
 
     newDict = {
         'timestamp': time,
-        'instanceID': idColumn,
+        dimension: idColumn,
         'metric': metricColumn,
         'max': maximum,
         'min': minimum,
         'avg': average
     }
+
     newDf = pd.DataFrame(data=newDict)
     today_file = date.today().strftime("%Y-%m-%d")
 
-    if(os.path.exists(today_file + '.csv')):
-        dtf = pd.read_csv(today_file + '.csv', index_col=0)
-        newOne = dtf.append(newDf, ignore_index=True)
-        newOne.to_csv(today_file + ".csv")
-    else:
-        newDf.to_csv(today_file + ".csv")
+    path = os.getcwd() + "/data/" + folderName + "/" + today_file + ".csv"
+    if(not newDf.empty):
+        try:
+            if(os.path.exists(path)):
+                dtf = pd.read_csv(path, index_col=0)
+                newOne = dtf.append(newDf, ignore_index=True)
+                newOne.to_csv(path)
+            else:
+                newDf.to_csv(path)
+        except Exception as e:
+            logger.error("Erro ao criar arquivos", e.__class__)

@@ -1,7 +1,15 @@
 {
-  "metricsDescription": [],
-  "instancesDescription": [],
-  "endTime": "",
-  "period": "",
-  "startTime": ""
+    "metricsDescription": [
+        {
+            "metricName": "GroupTotalInstances",
+            "namespace": "AWS/AutoScaling",
+            "dimension": "AutoScalingGroupName"
+        }
+    ],
+    "endTime": "2020-09-10T17:14:30.265660",
+    "period": "300",
+    "startTime": "2020-09-10T13:56:30.844386",
+    "storage": {
+        "AutoScalingGroupName": "asg"
+    }
 }
