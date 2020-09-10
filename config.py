@@ -48,7 +48,6 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     gran = input(cons.GRANURALITY)
     data[cons.PERIOD_KEY] = gran
 
-    print(cons.INFO_INSTANCES)
     f.seek(0)
     json.dump(data, f, indent=4)
     f.truncate()

@@ -10,9 +10,8 @@ from aws.API import API as api
 
 
 class CollectorAgent:
-    def __init__(self, metrics, dimensionsValues, start, end, period, storage):
+    def __init__(self, metrics, start, end, period, storage):
         self.metrics = metrics
-        self.dimensionsValues = dimensionsValues
         self.start = start
         self.end = end
         self.period = period
@@ -27,11 +26,9 @@ class CollectorAgent:
 
     def retrieveFromCloudWatch(self, metric):
         metricDimension = metric["dimension"]
-        valuesDimension = self.dimensionsValues[metricDimension]
-        # teste
-        valuesDimensions = getDimensionValues(metric["dimension"])
+        valuesDimension = self.getDimensionValues(metric["dimension"])
 
-        for value in valuesDimensions:
+        for value in valuesDimension:
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -56,6 +53,8 @@ class CollectorAgent:
                                   metric[cons.METRIC_NAME_KEY], value, e.__class__)
         self.logger.info(cons.END_COLLECTOR)
 
-    def getDimensionValues(dimension):
+    def getDimensionValues(self,dimension):
         if(dimension == "InstanceId"):
-            return api.describeInstances()
+            return self.api.describeInstances()
+        elif(dimension == "AutoScalingGroupName"):
+            return self.api.describeAutoScalingGroups()
