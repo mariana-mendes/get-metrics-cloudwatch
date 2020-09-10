@@ -12,7 +12,7 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
     metricColumn = [metric[cons.METRIC_NAME_KEY]] * totalRows
     dimension = metric[cons.DIMENSION_KEY]
 
-    idColumn = [value[metricDimension]] * totalRows
+    idColumn = [value] * totalRows
 
     time = []
     maximum = []

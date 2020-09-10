@@ -6,6 +6,7 @@ from dateutil.tz import tzlocal
 from process_data.process import joinMetrics
 from log.setup import setup_log
 import json
+from aws.API import API as api
 
 
 class CollectorAgent:
@@ -18,6 +19,7 @@ class CollectorAgent:
         self.client = boto3.client('cloudwatch')
         self.logger = setup_log()
         self.storage = storage
+        self.api = api()
 
     def getMetrics(self):
         for metric in self.metrics:
@@ -26,8 +28,10 @@ class CollectorAgent:
     def retrieveFromCloudWatch(self, metric):
         metricDimension = metric["dimension"]
         valuesDimension = self.dimensionsValues[metricDimension]
+        # teste
+        valuesDimensions = getDimensionValues(metric["dimension"])
 
-        for value in valuesDimension:
+        for value in valuesDimensions:
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -35,7 +39,7 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": value[metricDimension]
+                            "Value": value
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
@@ -51,3 +55,7 @@ class CollectorAgent:
                 self.logger.error('Something went wrong. Metric:  %s, Value: %s, Error: %s',
                                   metric[cons.METRIC_NAME_KEY], value, e.__class__)
         self.logger.info(cons.END_COLLECTOR)
+
+    def getDimensionValues(dimension):
+        if(dimension == "InstanceId"):
+            return api.describeInstances()

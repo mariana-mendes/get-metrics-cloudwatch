@@ -5,7 +5,12 @@ class API:
     def __init__(self):
         self.clientEC2 = boto3.client('ec2')
 
-    def describeInstances():
-        response = clientEC2.describe_instances()
+    def describeInstances(self):
+        response = self.clientEC2.describe_instances()["Reservations"]
+        instancesId = []
         for instance in response:
-            print(response)
+            info = instance["Instances"][0]
+            instancesId.append(info["InstanceId"])
+            # if "Tags" in info:
+            #     print(info["Tags"])
+      return instancesId

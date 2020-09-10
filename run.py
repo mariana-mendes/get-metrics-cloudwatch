@@ -50,10 +50,10 @@ with open(cons.CONFIG_FILE, 'r+') as f:
 
     cwapi = api()
 
-    api.describeInstances()
+    cwapi.describeInstances()
 
 # sender = sender()
 # logger = setup_log()
 # logger.info(cons.STARTING_COLLECTOR)
-# collector.getMetrics()
+collector.getMetrics()
 # sender.send_files()
