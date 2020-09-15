@@ -27,16 +27,18 @@ def getMetricDescription():
 
 def storageNames(descriptions):
 
-    dimensions = []
-    for ds in descriptions:
-        dimensions.append(ds[cons.DIMENSION_KEY])
-
+    dimensions = set(map(lambda ds: ds[cons.DIMENSION_KEY], descriptions))
     storageNames = {}
-    for dim in dimensions:
-        storageFolder = input("For metrics retrieve with dimension: " + dim)
-        storageNames[dim] = storageFolder
 
+    for dim in dimensions:
+        storageNames[dim]  = input(cons.ASK_FOLDER_NAMES.format(dim))
+       
     return storageNames
+
+def awsconfig():
+    region = input("AWS region: ")
+    bucket = input("\nBucket: ")
+    return {"region": region, "bucket": bucket}
 
 
 with open(cons.CONFIG_FILE, 'r+') as f:
@@ -45,6 +47,7 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     metricsDescription = getMetricDescription()
     data[cons.STORAGE] = storageNames(metricsDescription)
     data[cons.METRICS_KEY] = metricsDescription
+    data[cons.AWS_CONFIG] = awsconfig()
     gran = input(cons.GRANURALITY)
     data[cons.PERIOD_KEY] = gran
 
@@ -52,9 +55,7 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     json.dump(data, f, indent=4)
     f.truncate()
 
-    path = os.getcwd()
-
-    commandString = 'cd ' + path + ' && ' + './run.py'
+    commandString ='cd {} && ./run.py'.format(os.getcwd())
 
     username = getpass.getuser()
     cron = CronTab(user=username)
