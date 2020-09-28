@@ -11,22 +11,12 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
 
     time,maximum,minimum,average = [], [], [], []
     
-    newDictYstd = {'timestamp': [], dimension: [], 'metric': [], 'max': [], 'min': [], 'avg': []}
-    hasData = False
     for dtp in datapoints:
-        ## tratar problema da coleta às 00:00
         dt = (dtp['Timestamp']).replace(tzinfo=None)
-        if(dt.day != date.today().day):
-            hasData = True
-            newDictYstd["timestamp"].append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
-            newDictYstd["min"].append(dtp['Minimum'])
-            newDictYstd["max"].append(dtp['Maximum'])
-            newDictYstd["avg"].append(dtp['Average'])
-        else:
-            time.append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
-            maximum.append(dtp['Maximum'])
-            minimum.append(dtp['Minimum'])
-            average.append(dtp['Average'])
+        time.append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
+        maximum.append(dtp['Maximum'])
+        minimum.append(dtp['Minimum'])
+        average.append(dtp['Average'])
 
     totalRows = len(time)
     idColumn = [value] * totalRows
@@ -41,9 +31,6 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
         'avg': average
     }
 
-    ## tratar problema da coleta às 00:00
-    newDictYstd[dimension] =  [value] * len(newDictYstd['timestamp'])
-    newDictYstd['metric'] = [metric[cons.METRIC_NAME_KEY]] * len(newDictYstd['timestamp'])
 
     newDf = pd.DataFrame(data=newDict)
     today_file = date.today().strftime("%Y-%m-%d")
@@ -64,12 +51,3 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
                 newDf.to_csv(filePath)
         except Exception as e:
             logger.error("Erro ao criar arquivos", e.__class__)
-    
-    ## tratar problema da coleta às 00:00
-    yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-    filePath2 = path + "/" + yesterday + ".csv"
-    if(hasData & os.path.exists(filePath2)):
-        dtf = pd.read_csv(filePath2, index_col=0)
-        newDf2 = pd.DataFrame(data=newDictYstd)
-        newOne = dtf.append(newDf2, ignore_index=True)
-        newOne.to_csv(filePath2)
