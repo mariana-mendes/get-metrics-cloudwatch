@@ -16,9 +16,9 @@
             "dimension": "AutoScalingGroupName"
         }
     ],
-    "endTime": "2020-09-28T12:55:58.106522",
+    "endTime": "2020-09-28T14:21:35.974884",
     "period": "300",
-    "startTime": "2020-09-28T09:55:58.106534",
+    "startTime": "2020-09-28T11:21:35.974894",
     "storage": {
         "InstanceId": "ec2",
         "LoadBalancer": "elb",

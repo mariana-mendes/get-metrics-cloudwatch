@@ -14,7 +14,8 @@ class API:
         instancesId = []
         for instance in response:
             info = instance["Instances"][0]
-            instancesId.append(info["InstanceId"])
+            object = {"InstanceId": info["InstanceId"], "InstanceType": info["InstanceType"]}
+            instancesId.append(object)
         return instancesId
 
     '''Get all auto-scaling groups description and return an array of AutoScalingGroupName'''

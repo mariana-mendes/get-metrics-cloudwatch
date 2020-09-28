@@ -18,9 +18,17 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
         minimum.append(dtp['Minimum'])
         average.append(dtp['Average'])
 
+    
+
     totalRows = len(time)
     idColumn = [value] * totalRows
     metricColumn = [metric[cons.METRIC_NAME_KEY]] * totalRows
+    infoColumn = [''] * totalRows
+
+    if(not isinstance(value, str)):
+        idColumn = [value["InstanceId"]] * totalRows
+        infoColumn =  [value["InstanceType"]] * totalRows
+
     
     newDict = {
         'timestamp': time,
@@ -28,7 +36,8 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
         'metric': metricColumn,
         'max': maximum,
         'min': minimum,
-        'avg': average
+        'avg': average,
+        'info': infoColumn
     }
 
 

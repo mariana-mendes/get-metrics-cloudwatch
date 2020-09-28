@@ -8,6 +8,7 @@ from process_data.process import joinMetrics
 from log.setup import setup_log
 import json
 from aws.API import API as api
+import numpy as np
 
 
 class CollectorAgent:
@@ -31,7 +32,9 @@ class CollectorAgent:
     def retrieveFromCloudWatch(self, metric):
         metricDimension = metric["dimension"]
         valuesDimension = self.getDimensionValues(metric["dimension"])
-        for value in valuesDimension:
+        values = np.array(valuesDimension)
+        isObject =  values.dtype == object
+        for value in values:
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -39,7 +42,7 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": value
+                            "Value": self.getValueId(isObject, value)
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
@@ -51,6 +54,14 @@ class CollectorAgent:
                             self.storage[metricDimension])
             except exceptions.ClientError as error:
                 self.logger.error(error)
+
+
+    def getValueId(self, isObject, value):
+        if(isObject):
+            return value["InstanceId"]
+        else:
+            return value
+
 
     ''' Return list of values (ids, unique names, etc) from a specific dimension.'''
     def getDimensionValues(self, dimension):
