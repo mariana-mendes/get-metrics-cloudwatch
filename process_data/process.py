@@ -4,21 +4,16 @@ from datetime import date, datetime, timedelta
 from log.setup import setup_log
 import constants as cons
 
-def joinMetrics(response, metric, metricDimension, value, folderName):
-    logger = setup_log()
-    datapoints = response[cons.DATAPOINTS_KEY]
+def createNewDf(datapoints, metric, metricDimension, value):
     dimension = metric[cons.DIMENSION_KEY]
-
     time,maximum,minimum,average = [], [], [], []
-    
+
     for dtp in datapoints:
         dt = (dtp['Timestamp']).replace(tzinfo=None)
         time.append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
         maximum.append(dtp['Maximum'])
         minimum.append(dtp['Minimum'])
         average.append(dtp['Average'])
-
-    
 
     totalRows = len(time)
     idColumn = [value] * totalRows
@@ -28,7 +23,6 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
     if(not isinstance(value, str)):
         idColumn = [value["InstanceId"]] * totalRows
         infoColumn =  [value["InstanceType"]] * totalRows
-
     
     newDict = {
         'timestamp': time,
@@ -40,7 +34,33 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
         'info': infoColumn
     }
 
+    return newDict
 
+
+def _isDataFromToday(dtp):
+    return (dtp['Timestamp']).replace(tzinfo=None).day == date.today().day
+
+def _isDataFromYesterday(dtp):
+    return (dtp['Timestamp']).replace(tzinfo=None).day != date.today().day
+
+def joinMetrics(response, metric, metricDimension, value, folderName):
+    datapoints = response[cons.DATAPOINTS_KEY]
+
+    yesterdayDTP = filter(_isDataFromYesterday, datapoints)
+
+    if(len(list(yesterdayDTP)) != 0):
+        yesterdayDf = createNewDf(yesterdayDTP, metric, metricDimension, value)
+        editOrCreateFiles(yesterdayDf, folderName)
+
+    todayDTP = filter(_isDataFromToday, datapoints)
+
+    if(len(list(todayDTP)) != 0):
+        yesterdayDf = createNewDf(todayDTP, metric, metricDimension, value)
+        editOrCreateFiles(todayDTP, folderName)
+
+
+def editOrCreateFiles(newDict, folderName):
+    logger = setup_log()
     newDf = pd.DataFrame(data=newDict)
     today_file = date.today().strftime("%Y-%m-%d")
 
@@ -60,3 +80,5 @@ def joinMetrics(response, metric, metricDimension, value, folderName):
                 newDf.to_csv(filePath)
         except Exception as e:
             logger.error("Erro ao criar arquivos", e.__class__)
+
+
