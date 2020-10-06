@@ -46,22 +46,23 @@ def _isDataFromYesterday(dtp):
 def joinMetrics(response, metric, metricDimension, value, folderName):
     datapoints = response[cons.DATAPOINTS_KEY]
 
-    yesterdayDTP = filter(_isDataFromYesterday, datapoints)
+    yesterdayDTP = list(filter(_isDataFromYesterday, datapoints))
 
-    if(len(list(yesterdayDTP)) != 0):
+    if(len(yesterdayDTP) != 0):
         yesterdayDf = createNewDf(yesterdayDTP, metric, metricDimension, value)
         editOrCreateFiles(yesterdayDf, folderName)
 
-    todayDTP = filter(_isDataFromToday, datapoints)
+    todayDTP = list(filter(_isDataFromToday, datapoints))
 
-    if(len(list(todayDTP)) != 0):
-        yesterdayDf = createNewDf(todayDTP, metric, metricDimension, value)
-        editOrCreateFiles(todayDTP, folderName)
+    if(len(todayDTP) != 0):
+        todayDf = createNewDf(todayDTP, metric, metricDimension, value)
+        editOrCreateFiles(todayDf, folderName)
 
 
 def editOrCreateFiles(newDict, folderName):
     logger = setup_log()
     newDf = pd.DataFrame(data=newDict)
+   
     today_file = date.today().strftime("%Y-%m-%d")
 
     path =  os.path.join(os.getcwd(),"data", folderName)
