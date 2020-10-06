@@ -10,21 +10,29 @@
       ```{
           "Version": "2012-10-17",
           "Statement": [
-        {
+          {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
                 "autoscaling:DescribeAutoScalingInstances",
                 "cloudwatch:PutMetricData",
                 "cloudwatch:GetMetricData",
-                "autoscaling:DescribeScalingActivities",
                 "ec2:DescribeTags",
-                "autoscaling:DescribeAutoScalingGroups",
+                "elasticloadbalancing:DescribeTags",
+                "elasticloadbalancing:DescribeLoadBalancerPolicyTypes",
                 "cloudwatch:GetMetricStatistics",
-                "cloudwatch:ListMetrics"
+                "cloudwatch:ListMetrics",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "autoscaling:DescribeScalingActivities",
+                "autoscaling:DescribeAutoScalingGroups",
+                "elasticloadbalancing:DescribeLoadBalancerPolicies",
+                "elasticloadbalancing:DescribeInstanceHealth"
             ],
             "Resource": "*"
-        }]}```
+          }
+              ]
+       }```
      
 ### Inital config 
 * Clone the repo:  $ `git clone https://github.com/mariana-mendes/get-metrics-cloudwatch.git && cd get-metrics-cloudwatch` 
@@ -33,24 +41,43 @@
 
 ### Choosing your metrics
 * Make sure that your metric is already monitored by cloudwatch
-* Check the granularity of points (Default for monitoring in cloudwatch is 300s or 5 minutes)
+* Check the granularity of points (Default for monitoring in cloudwatch is 300s (5 minutes))
 * Type correctly the metric name and the namespace.
 * Pay attetion in the name of your S3 bucket. 
 
 Make sure that your config looks like this:
    ```
-   { 
-        "metricsDescription": [
-           {
-             "metricName": "CPUUtilization",
-             "namespace": "AWS/EC2"
-           }
-         ],
-        "instancesDescription": [],
-        "endTime": "2020-09-02T18:00:05.064378",
-        "period": "300",
-        "startTime": "2020-09-02T15:00:05.064401" 
-   }
+  {
+    "metricsDescription": [
+        {
+            "metricName": "CPUUtilization",
+            "namespace": "AWS/EC2",
+            "dimension": "InstanceId"
+        },
+        {
+            "metricName": "RequestCount",
+            "namespace": "AWS/ApplicationELB",
+            "dimension": "LoadBalancer"
+        },
+        {
+            "metricName": "GroupTotalCapacity",
+            "namespace": "AWS/AutoScaling",
+            "dimension": "AutoScalingGroupName"
+        }
+    ],
+    "endTime": "2020-09-15T20:00:02.819519",
+    "period": "300",
+    "startTime": "2020-09-15T19:00:02.819532",
+    "storage": {
+        "InstanceId": "folder-in-my-bucket",
+        "LoadBalancer": "also-local-folder",
+        "AutoScalingGroupName": "folder-name"
+    },
+    "aws-config": {
+        "region": "us-east-1",
+        "bucket": "my-bucket-name"
+    }
+}
    ```
 
 

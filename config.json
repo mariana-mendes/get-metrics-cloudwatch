@@ -1,15 +1,26 @@
 {
     "metricsDescription": [
         {
-            "metricName": "GroupTotalInstances",
-            "namespace": "AWS/AutoScaling",
-            "dimension": "AutoScalingGroupName"
+            "metricName": "CPUUtilization",
+            "namespace": "AWS/EC2",
+            "dimension": "InstanceId"
+        },
+        {
+            "metricName": "RequestCount",
+            "namespace": "AWS/ApplicationELB",
+            "dimension": "LoadBalancer"
         }
     ],
-    "endTime": "2020-09-10T17:14:30.265660",
+    "endTime": "2020-10-06T12:00:03.846818",
     "period": "300",
-    "startTime": "2020-09-10T13:56:30.844386",
+    "startTime": "2020-10-06T09:00:03.846831",
     "storage": {
+        "InstanceId": "ec2",
+        "LoadBalancer": "elb",
         "AutoScalingGroupName": "asg"
+    },
+    "aws-config": {
+        "region": "us-east-1",
+        "bucket": "metrics-collector-cw"
     }
 }

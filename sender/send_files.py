@@ -5,12 +5,13 @@ import constants as cons
 import tarfile
 import os
 
-
 class Sender:
-    def __init__(self):
+    def __init__(self, awsconfig):
         self.logger = setup_log()
-        self.client = boto3.client('s3')
+        self.client = boto3.client('s3', awsconfig['region'])
         self.buckets = self.client.list_buckets()['Buckets']
+        self.bucket = awsconfig["bucket"]
+        self.s3 = boto3.resource('s3')
 
     def compress_file(self, fileName, pathName):
         os.chdir(pathName)
@@ -19,6 +20,9 @@ class Sender:
             newFile.add(pathName + "/" + fileName,
                         arcname=fileName, recursive=False)
 
+    def bucketExists(self):
+       return not self.s3.Bucket(self.bucket).creation_date is None 
+
     def send_files(self):
         self.logger.info(cons.STARTING_SEND_FILES)
         originalDir = os.getcwd()
@@ -26,18 +30,18 @@ class Sender:
 
         try:
             for folderName, subfolders, filenames in os.walk(dirData):
-                for filename in filenames:
-                    filePath = os.path.join(folderName, filename)
-                    if filename.endswith(".csv"):
-                        folderS3 = folderName.split("/")[-1]
-                        fileNameBase=os.path.splitext(
-                            filename)[0] + ".tar.gz"
-                        self.compress_file(filename, folderName)
-                        response = self.client.upload_file(folderName + "/" + fileNameBase, 'log-ec2-instance', folderS3+'/{}'.format(fileNameBase))
+                    for filename in filenames:
+                        filePath = os.path.join(folderName, filename)
+                        if filename.endswith(".csv"):
+                            folderS3 = folderName.split("/")[-1]
+                            fileNameBase=os.path.splitext(
+                                filename)[0] + ".tar.gz"
+                            self.compress_file(filename, folderName)
+                            if(self.bucketExists()):
+                                response = self.client.upload_file(folderName + "/" + fileNameBase, self.bucket, folderS3+'/{}'.format(fileNameBase))
+                            else: 
+                                self.logger.error("Unsend files - Bucket {} doesn't existis".format(self.bucket))
             os.chdir(originalDir)
         except Exception as e:
-            self.logger.error(
-                "Something went wrong trying to send files: %s", e.__class__)
-            response={'ResponseMetadata': {'HTTPStatusCode': 404}}
-
+            self.logger.error(cons.ERROR_SEND_FILES.format(e.__class__))
         self.logger.info("Finishing data send to s3 bucket.")
