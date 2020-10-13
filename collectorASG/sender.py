@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 import boto3
 import tarfile
 import os
@@ -19,6 +19,7 @@ def send_files(awsconfig):
         for filename in filenames:
             filePath = os.path.join(folderName, filename)
 
+            # adicionar aqui para só enviar csv de dois dias (hoje e ontem)
             if filename.endswith(".csv"):
 
                 fileNameBase = os.path.splitext(filename)[0] + ".tar.gz"
@@ -29,7 +30,13 @@ def send_files(awsconfig):
                                 arcname=filename,
                                 recursive=False)
 
-                if (bucketExists(s3, bucket)):
+                # To evict send files from all days
+                fileDay = os.path.splitext(filename)[0]
+                today = date.today().strftime("%Y-%m-%d")
+                yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+                if (bucketExists(s3, bucket) and (today in fileDay or yesterday in fileDay)):
+                    print('envia')
                     response = client.upload_file(
                         folderName + "/" + fileNameBase, bucket,
                         "data" + '/{}'.format(fileNameBase))
