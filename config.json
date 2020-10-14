@@ -11,9 +11,9 @@
             "dimension": "LoadBalancer"
         }
     ],
-    "endTime": "2020-10-13T03:00:05.754065",
+    "endTime": "2020-10-14T14:44:41.964130",
     "period": "300",
-    "startTime": "2020-10-13T00:00:05.754077",
+    "startTime": "2020-10-14T11:44:41.964138",
     "storage": {
         "InstanceId": "ec2",
         "LoadBalancer": "elb",

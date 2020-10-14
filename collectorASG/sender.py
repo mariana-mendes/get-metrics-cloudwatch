@@ -36,7 +36,6 @@ def send_files(awsconfig):
                 yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 
                 if (bucketExists(s3, bucket) and (today in fileDay or yesterday in fileDay)):
-                    print('envia')
                     response = client.upload_file(
                         folderName + "/" + fileNameBase, bucket,
                         "data" + '/{}'.format(fileNameBase))

@@ -10,8 +10,8 @@ def createNewDf(datapoints, metric, metricDimension, value):
     time, maximum, minimum, average = [], [], [], []
 
     for dtp in datapoints:
-        dt = (dtp['Timestamp']).replace(tzinfo=None)
-        time.append(dt.strftime("%m/%d/%Y, %H:%M:%S"))
+        dt = (dtp['Timestamp']).timestamp()
+        time.append(dt)
         maximum.append(dtp['Maximum'])
         minimum.append(dtp['Minimum'])
         average.append(dtp['Average'])

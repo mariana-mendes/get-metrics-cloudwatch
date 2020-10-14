@@ -8,7 +8,7 @@ def processASGFiles(response):
 
     instanceIds, asgNames, timestamp = [], [], []
 
-    currentHour = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+    currentHour = datetime.now().timestamp()
 
     for asg in autoscalingGroups:
         qtyInstances = len(list(map(_getInstanceId, asg['Instances'])))
@@ -58,10 +58,8 @@ def saveRawFile(response):
         AutoScalingGroupName.append(activity['AutoScalingGroupName'])
         Description.append(activity['Description'])
         Cause.append(activity['Cause'])
-        StartTime.append(activity['StartTime'].replace(
-            tzinfo=None).strftime("%m/%d/%Y, %H:%M:%S"))
-        EndTime.append(activity['EndTime'].replace(
-            tzinfo=None).strftime("%m/%d/%Y, %H:%M:%S"))
+        StartTime.append(activity['StartTime'].timestamp())
+        EndTime.append(activity['EndTime'].timestamp())
         StatusCode.append(activity['StatusCode'])
 
     newDict = {
