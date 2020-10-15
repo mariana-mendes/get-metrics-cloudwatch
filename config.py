@@ -7,7 +7,6 @@ import constants as cons
 from crontab import CronTab
 import getpass
 
-
 def getMetricDescription():
     ans = input(cons.ASK_FOR_NEW_METRIC)
     descriptions = []
@@ -16,9 +15,11 @@ def getMetricDescription():
         metricName = input("Metric name:  ")
         namespace = input('\nNamespace: ')
         dimension = input('\nDimension:')
+        statiscs = input('Statistics (separeted by comma): ')
         newDescription = {cons.METRIC_NAME_KEY: metricName,
                           cons.NAMESPACE_KEY: namespace,
-                          cons.DIMENSION_KEY: dimension}
+                          cons.DIMENSION_KEY: dimension},
+                          cons.STATISTICS_KEY: statiscs.split(',')
         descriptions.append(newDescription)
         print(descriptions)
         ans = input(cons.ASK_FOR_NEW_METRIC)
@@ -34,6 +35,9 @@ def storageNames(descriptions):
         storageNames[dim]  = input(cons.ASK_FOLDER_NAMES.format(dim))
        
     return storageNames
+
+
+
 
 def awsconfig():
     region = input("AWS region: ")

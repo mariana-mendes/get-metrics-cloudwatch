@@ -11,30 +11,16 @@ class API:
 
     def describeInstances(self):
         response = self.clientEC2.describe_instances()["Reservations"]
-        instancesId = []
-        for instance in response:
-            info = instance["Instances"][0]
-            object = {"InstanceId": info["InstanceId"], "InstanceType": info["InstanceType"]}
-            instancesId.append(object)
-        return instancesId
-
+        return map(lambda instanceInfo: instanceInfo["Instances"][0], response)
+     
     '''Get all auto-scaling groups description and return an array of AutoScalingGroupName'''
-
     def describeAutoScalingGroups(self):
-        response = self.clientASG.describe_auto_scaling_groups(
+        return self.clientASG.describe_auto_scaling_groups(
         )['AutoScalingGroups']
-        groupNames = []
-        for group in response:
-            groupNames.append(group["AutoScalingGroupName"])
-        return groupNames
 
-    '''Get all load balancers description and return an array of LoadBalancerName'''
-
+    
+    '''Get all load balancers description and return'''
     def describeLoadBalancers(self):
-        response = self.clientELB.describe_load_balancers()['LoadBalancers']
-        elbNames = []
-        for lb in response:
-            stringLB = lb['LoadBalancerArn'].split(':')[-1].split(
-                "loadbalancer/")[-1]
-            elbNames.append(stringLB)
-        return elbNames
+        return self.clientELB.describe_load_balancers()['LoadBalancers']
+    
+
