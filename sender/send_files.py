@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from log.setup import setup_log
 import boto3
 import constants as cons
@@ -32,12 +32,18 @@ class Sender:
             for folderName, subfolders, filenames in os.walk(dirData):
                     for filename in filenames:
                         filePath = os.path.join(folderName, filename)
+
                         if filename.endswith(".csv"):
                             folderS3 = folderName.split("/")[-1]
                             fileNameBase=os.path.splitext(
                                 filename)[0] + ".tar.gz"
+                            fileDay = os.path.splitext(filename)[0]
+                            today = date.today().strftime("%Y-%m-%d")
+                            yesterday = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
                             self.compress_file(filename, folderName)
-                            if(self.bucketExists()):
+
+                            # To evict send files from all days
+                            if(self.bucketExists() and (fileDay == today or fileDay == yesterday)):
                                 response = self.client.upload_file(folderName + "/" + fileNameBase, self.bucket, folderS3+'/{}'.format(fileNameBase))
                             else: 
                                 self.logger.error("Unsend files - Bucket {} doesn't existis".format(self.bucket))
