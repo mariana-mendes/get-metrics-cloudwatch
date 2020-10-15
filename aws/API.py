@@ -15,12 +15,15 @@ class API:
      
     '''Get all auto-scaling groups description and return an array of AutoScalingGroupName'''
     def describeAutoScalingGroups(self):
-        return self.clientASG.describe_auto_scaling_groups(
-        )['AutoScalingGroups']
+        return self.clientASG.describe_auto_scaling_groups()
 
     
     '''Get all load balancers description and return'''
     def describeLoadBalancers(self):
         return self.clientELB.describe_load_balancers()['LoadBalancers']
     
+    def getScalingActivities(self):
+        return self.clientASG.describe_scaling_activities()
+
+
 

@@ -18,8 +18,8 @@ def getMetricDescription():
         statiscs = input('Statistics (separeted by comma): ')
         newDescription = {cons.METRIC_NAME_KEY: metricName,
                           cons.NAMESPACE_KEY: namespace,
-                          cons.DIMENSION_KEY: dimension},
-                          cons.STATISTICS_KEY: statiscs.split(',')
+                          cons.DIMENSION_KEY: dimension,
+                          cons.STATISTICS_KEY: statiscs.split(',')}
         descriptions.append(newDescription)
         print(descriptions)
         ans = input(cons.ASK_FOR_NEW_METRIC)

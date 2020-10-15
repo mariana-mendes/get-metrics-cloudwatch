@@ -4,7 +4,7 @@ from botocore import exceptions
 import dateutil.parser
 import datetime
 from dateutil.tz import tzlocal
-from process_data.process import joinMetrics
+from process_data.process import joinMetrics, saveRawFile, processASGFiles
 from log.setup import setup_log
 import json
 from aws.API import API as api
@@ -50,7 +50,7 @@ class CollectorAgent:
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
                 joinMetrics(response, metric, value, self.storage[metricDimension])
-                
+
             except exceptions.ClientError as error:
                 self.logger.error(error)
 
@@ -77,3 +77,18 @@ class CollectorAgent:
         stringLB = lb[cons.LOADBALANCER_ID_KEY].split(':')[-1].split(
                 "loadbalancer/")[-1]
         return stringLB
+
+    def getDescriptionsASG(self):
+        try:
+            response = self.api.describeAutoScalingGroups()
+            processASGFiles(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group descriptions')
+
+    def getEventsASG(self):
+        try:
+            response = self.api.getScalingActivities()
+            saveRawFile(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group activities')
+
