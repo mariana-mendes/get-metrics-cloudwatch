@@ -18,9 +18,9 @@
             ]
         }
     ],
-    "endTime": "2020-10-15T18:55:47.323712",
+    "endTime": "2020-10-16T04:00:03.636037",
     "period": "300",
-    "startTime": "2020-10-15T15:55:47.323721",
+    "startTime": "2020-10-16T01:00:03.636050",
     "storage": {
         "InstanceId": "ec2",
         "LoadBalancerArn": "lb"

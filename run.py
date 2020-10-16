@@ -24,7 +24,6 @@ with open(cons.CONFIG_FILE, 'r+') as f:
 collector = CWA(data[cons.METRICS_KEY],  data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE], data[cons.AWS_CONFIG])
 
 cwapi = api()
-cwapi.describeInstances()
 sender = sender(data[cons.AWS_CONFIG])
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
