@@ -5,60 +5,40 @@ from log.setup import setup_log
 import constants as cons
 
 
-def createNewDf(datapoints, metric, metricDimension, value):
+def createNewDf(datapoints, metric, value):
+    statistics = metric[cons.STATISTICS_KEY]
+    timestampArray = list(map(lambda dtp: (dtp['Timestamp']).timestamp(), datapoints))
+    newDict = {'timestamp': timestampArray}
+    totalRows = len(newDict['timestamp'])
+    for stat in statistics: 
+        statValues = list(map(lambda dtp: dtp[stat], datapoints))
+        newDict[stat] = statValues
+
     dimension = metric[cons.DIMENSION_KEY]
-    time, maximum, minimum, average = [], [], [], []
+    newDict[dimension] = [value[dimension]] * totalRows
+    newDict[cons.METRIC_NAME_KEY]  = [metric[cons.METRIC_NAME_KEY]]* totalRows
 
-    for dtp in datapoints:
-        dt = (dtp['Timestamp']).timestamp()
-        time.append(dt)
-        maximum.append(dtp['Maximum'])
-        minimum.append(dtp['Minimum'])
-        average.append(dtp['Average'])
 
-    totalRows = len(time)
-    idColumn = [value] * totalRows
-    metricColumn = [metric[cons.METRIC_NAME_KEY]] * totalRows
-    infoColumn = [''] * totalRows
-
-    if (not isinstance(value, str)):
-        idColumn = [value["InstanceId"]] * totalRows
-        infoColumn = [value["InstanceType"]] * totalRows
-
-    newDict = {
-        'timestamp': time,
-        dimension: idColumn,
-        'metric': metricColumn,
-        'max': maximum,
-        'min': minimum,
-        'avg': average,
-        'info': infoColumn
-    }
-
+    if(metric[cons.DIMENSION_KEY] == cons.INSTANCE_ID_KEY):
+        flavor = value['InstanceType']
+        newDict['InstanceType'] = [flavor] * totalRows
+   
     return newDict
 
 
-def _isDataFromToday(dtp):
-    return (dtp['Timestamp']).replace(tzinfo=None).day == date.today().day
-
-
-def _isDataFromYesterday(dtp):
-    return (dtp['Timestamp']).replace(tzinfo=None).day != date.today().day
-
-
-def joinMetrics(response, metric, metricDimension, value, folderName):
+def joinMetrics(response, metric, value, folderName):
     datapoints = response[cons.DATAPOINTS_KEY]
 
-    yesterdayDTP = list(filter(_isDataFromYesterday, datapoints))
+    yesterdayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day != date.today().day) , datapoints  ))
 
     if (len(yesterdayDTP) != 0):
-        yesterdayDf = createNewDf(yesterdayDTP, metric, metricDimension, value)
+        yesterdayDf = createNewDf(yesterdayDTP, metric, value)
         editOrCreateFiles(yesterdayDf, folderName)
 
-    todayDTP = list(filter(_isDataFromToday, datapoints))
+    todayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day == date.today().day) , datapoints  ))
 
     if (len(todayDTP) != 0):
-        todayDf = createNewDf(todayDTP, metric, metricDimension, value)
+        todayDf = createNewDf(todayDTP, metric, value)
         editOrCreateFiles(todayDf, folderName)
 
 
@@ -86,4 +66,59 @@ def editOrCreateFiles(newDict, folderName):
             logger.error("Erro ao criar arquivos", e.__class__)
 
 
+def processASGFiles(response):
+    autoscalingGroups = response['AutoScalingGroups']
+    newDict = {}
 
+    instanceIds, asgNames, timestamp = [], [], []
+
+    currentHour = datetime.now().timestamp()
+
+    for asg in autoscalingGroups:
+        qtyInstances = len(list(map(_getInstanceId, asg['Instances'])))
+        instanceIds += list(map(_getInstanceId, asg['Instances']))
+        asgNames += [asg['AutoScalingGroupName']] * qtyInstances
+
+    timestamp = [currentHour] * len(instanceIds)
+    newDict = {
+        'timestamp': timestamp,
+        'InstanceId': instanceIds,
+        'AutoscalingGroup': asgNames
+    }
+    newDf = pd.DataFrame(data=newDict)
+
+    editOrCreateFiles(newDf, 'asg')
+
+
+def _getInstanceId(item):
+    return item['InstanceId']
+
+
+def saveRawFile(response):
+    today_file = "events-" + date.today().strftime("%Y-%m-%d")
+    path = os.path.join(os.getcwd(), "data")
+    filePath = path + "/" + today_file + ".csv"
+
+    ActivityId, AutoScalingGroupName, Description, Cause, StartTime,EndTime, StatusCode = [],[],[],[],[],[],[]
+
+    for activity in response['Activities']:
+        ActivityId.append(activity['ActivityId'])
+        AutoScalingGroupName.append(activity['AutoScalingGroupName'])
+        Description.append(activity['Description'])
+        Cause.append(activity['Cause'])
+        StartTime.append(activity['StartTime'].timestamp())
+        EndTime.append(activity['EndTime'].timestamp())
+        StatusCode.append(activity['StatusCode'])
+
+    newDict = {
+        "ActivityId": ActivityId,
+        "AutoScalingGroupName": AutoScalingGroupName,
+        "Description": Description,
+        "Cause": Cause,
+        "StartTime": StartTime,
+        "EndTime": EndTime,
+        "StatusCode": StatusCode
+    }
+    newDf = pd.DataFrame(data=newDict)
+
+    editOrCreateFiles(newDf, 'asg-events')

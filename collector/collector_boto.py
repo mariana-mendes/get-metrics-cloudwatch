@@ -4,7 +4,7 @@ from botocore import exceptions
 import dateutil.parser
 import datetime
 from dateutil.tz import tzlocal
-from process_data.process import joinMetrics
+from process_data.process import joinMetrics, saveRawFile, processASGFiles
 from log.setup import setup_log
 import json
 from aws.API import API as api
@@ -30,11 +30,10 @@ class CollectorAgent:
     ''' With the metric name and the dimension (id, name, unique value, etc), 
        retrieve the metric from CloudWatch for each dimension value'''
     def retrieveFromCloudWatch(self, metric):
-        metricDimension = metric["dimension"]
-        valuesDimension = self.getDimensionValues(metric["dimension"])
-        values = np.array(valuesDimension)
-        isObject =  values.dtype == object
-        for value in values:
+        metricDimension = metric[cons.DIMENSION_KEY]
+        valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
+
+        for value in valuesDimension:
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -42,25 +41,25 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": self.getValueId(isObject, value)
+                            "Value": self.getValueId(metricDimension, value)
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
                     EndTime=dateutil.parser.isoparse(self.end),
                     Period=int(self.period),
-                    Statistics=['Average', 'Minimum', 'Maximum'],
+                    Statistics=metric[cons.STATISTICS_KEY],
                 )
-                joinMetrics(response, metric, metricDimension, value,
-                            self.storage[metricDimension])
+                joinMetrics(response, metric, value, self.storage[metricDimension])
+
             except exceptions.ClientError as error:
                 self.logger.error(error)
 
 
-    def getValueId(self, isObject, value):
-        if(isObject):
-            return value["InstanceId"]
+    def getValueId(self, metricDimension, value):
+        if(metricDimension == cons.LOADBALANCER_ID_KEY):
+            return self._getLoadBalancerName(value)
         else:
-            return value
+            return value[metricDimension]
 
 
     ''' Return list of values (ids, unique names, etc) from a specific dimension.'''
@@ -73,3 +72,23 @@ class CollectorAgent:
         elif(dimension == cons.LOADBALANCER_ID_KEY):
             values =   self.api.describeLoadBalancers()
         return values
+
+    def _getLoadBalancerName(self, lb):
+        stringLB = lb[cons.LOADBALANCER_ID_KEY].split(':')[-1].split(
+                "loadbalancer/")[-1]
+        return stringLB
+
+    def getDescriptionsASG(self):
+        try:
+            response = self.api.describeAutoScalingGroups()
+            processASGFiles(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group descriptions')
+
+    def getEventsASG(self):
+        try:
+            response = self.api.getScalingActivities()
+            saveRawFile(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group activities')
+
