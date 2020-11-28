@@ -2,10 +2,12 @@ import boto3
 
 
 class API:
-    def __init__(self):
-        self.clientEC2 = boto3.client('ec2')
-        self.clientASG = boto3.client('autoscaling')
-        self.clientELB = boto3.client('elbv2')
+    def __init__(self, region):
+        self.clientEC2 = boto3.client('ec2', region)
+        self.clientASG = boto3.client('autoscaling',region)
+        self.clientELB = boto3.client('elbv2',region)
+        self.clientELBClassic = boto3.client('elb', region)
+
 
     '''Get all ec2 instances description and return an array of InstanceId'''
 
@@ -21,6 +23,10 @@ class API:
     '''Get all load balancers description and return'''
     def describeLoadBalancers(self):
         return self.clientELB.describe_load_balancers()['LoadBalancers']
+
+    '''Get all load balancers description and return'''
+    def describeLoadBalancersClassic(self):
+        return self.clientELBClassic.describe_load_balancers()['LoadBalancerDescriptions']    
     
     def getScalingActivities(self):
         return self.clientASG.describe_scaling_activities()

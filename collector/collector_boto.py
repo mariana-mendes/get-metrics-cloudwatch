@@ -14,13 +14,14 @@ import numpy as np
 class CollectorAgent:
     def __init__(self, metrics, start, end, period, storage, awsconfig):
         self.metrics = metrics
+        self.region = awsconfig["region"]
         self.start = start
         self.end = end
         self.period = period
-        self.client = boto3.client('cloudwatch', awsconfig["region"])
+        self.client = boto3.client('cloudwatch', self.region)
         self.logger = setup_log()
         self.storage = storage
-        self.api = api()
+        self.api = api(self.region)
 
     ''' For each metric registered in config.json (metricsDescription) call retrieveFromCloudWatch'''
     def getMetrics(self):
@@ -71,6 +72,8 @@ class CollectorAgent:
             values =  self.api.describeAutoScalingGroups()
         elif(dimension == "LoadBalancer"):
             values =   self.api.describeLoadBalancers()
+        elif(dimension == "LoadBalancerName"):
+            values = self.api.describeLoadBalancersClassic()    
         return values
 
     def _getLoadBalancerName(self, lb):
