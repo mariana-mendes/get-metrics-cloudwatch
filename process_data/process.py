@@ -6,6 +6,7 @@ import constants as cons
 
 
 def createNewDf(datapoints, metric, value):
+
     statistics = metric[cons.STATISTICS_KEY]
     timestampArray = list(map(lambda dtp: (dtp['Timestamp']).timestamp(), datapoints))
     newDict = {'timestamp': timestampArray}
@@ -15,6 +16,9 @@ def createNewDf(datapoints, metric, value):
         newDict[stat] = statValues
 
     dimension = metric[cons.DIMENSION_KEY]
+    if(metric[cons.DIMENSION_KEY] == "LoadBalancer"):
+        dimension =  "LoadBalancerName"
+
     newDict[dimension] = [value[dimension]] * totalRows
     newDict[cons.METRIC_NAME_KEY]  = [metric[cons.METRIC_NAME_KEY]]* totalRows
 

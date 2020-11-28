@@ -56,7 +56,7 @@ class CollectorAgent:
 
 
     def getValueId(self, metricDimension, value):
-        if(metricDimension == cons.LOADBALANCER_ID_KEY):
+        if(metricDimension == "LoadBalancer"):
             return self._getLoadBalancerName(value)
         else:
             return value[metricDimension]
@@ -69,12 +69,12 @@ class CollectorAgent:
             values =  self.api.describeInstances()
         elif(dimension == cons.AUTOSCALINGGROUP_ID_KEY):
             values =  self.api.describeAutoScalingGroups()
-        elif(dimension == cons.LOADBALANCER_ID_KEY):
+        elif(dimension == "LoadBalancer"):
             values =   self.api.describeLoadBalancers()
         return values
 
     def _getLoadBalancerName(self, lb):
-        stringLB = lb[cons.LOADBALANCER_ID_KEY].split(':')[-1].split(
+        stringLB = lb["LoadBalancerArn"].split(':')[-1].split(
                 "loadbalancer/")[-1]
         return stringLB
 
