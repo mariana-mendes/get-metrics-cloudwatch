@@ -22,9 +22,7 @@ files.pop()
 
 data_frame_day = {}
 
-print("Tratando...")
 for f in files:
-    print(f)
     df = pd.read_csv(folder + '/' + f, index_col=0)
     for i in range(0,len(df.index)):
         description = df.loc[i,'Description']
@@ -49,9 +47,7 @@ for f in files:
             data_frame_day[start_date] = []
         data_frame_day[start_date].append(new_arr)
 
-print("Gerando csv...")
 for key in data_frame_day:
-    print(key)
     new_df = pd.DataFrame(data_frame_day[key], columns=['ActivityId','AutoScalingGroupName','Description','Cause','StartTime','EndTime','StatusCode','ActionActor','Scaling'])
     new_df = new_df.drop_duplicates(subset=['ActivityId'])
     new_df.to_csv(output_folder + '/' + key + '.csv', index=False)
