@@ -20,9 +20,12 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
+files = ['2020-11-25.csv']
+
 for f in files:
     print(f, '-------------------------------------------------------------')
     fin = open(folder + f).read().splitlines()
+    print(len(fin))
     if(len(fin) > 0):
         fout = open(output_folder + f, "wt")
         col = len(fin[0].split(','))

@@ -20,8 +20,6 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
-# files = ['2020-11-05.csv','2020-11-06.csv']
-
 data_frame_day = {}
 
 head = []
@@ -33,13 +31,22 @@ for f in files:
     index = list(df.index.values)
     df = df[~df.index.duplicated(keep='first')]
     for i in index:
-        timestamp = df.loc[i,'timestamp']
-        metric = df.loc[i,'Average']
-        date = time.strftime('%Y-%m-%d', time.localtime(timestamp))
-        row = df.loc[i]
-        if (not (date in data_frame_day.keys())):
-            data_frame_day[date] = []
-        if metric <= 100:
+        metrics_ok = True
+        if 'Average' in head:
+            metrics_ok = (metrics_ok and df.loc[i,'Average'] <= 100)
+        if 'Maximum' in head:
+            metrics_ok = (metrics_ok and df.loc[i,'Maximum'] <= 100)
+        if 'Minimum' in head:
+            metrics_ok = (metrics_ok and df.loc[i,'Minimum'] <= 100)
+        if 'Sum' in head:
+            metrics_ok = (metrics_ok and df.loc[i,'Sum'] <= 100)
+        
+        if metrics_ok:
+            timestamp = df.loc[i,'timestamp']
+            date = time.strftime('%Y-%m-%d', time.localtime(timestamp))
+            row = df.loc[i]
+            if (not (date in data_frame_day.keys())):
+                data_frame_day[date] = []
             data_frame_day[date].append(row)
 
 for key in data_frame_day:
