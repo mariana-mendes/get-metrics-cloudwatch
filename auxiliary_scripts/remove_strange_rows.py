@@ -20,8 +20,6 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
-files = ['2020-11-25.csv']
-
 for f in files:
     print(f, '-------------------------------------------------------------')
     fin = open(folder + f).read().splitlines()
@@ -29,20 +27,16 @@ for f in files:
     if(len(fin) > 0):
         fout = open(output_folder + f, "wt")
         col = len(fin[0].split(','))
-        fout.write(fin[0] + '\n')
         for line in fin:
             data = line.split(',')
             if(len(data) != col):
                 print(line + '\n')
             else:
-                ok = True
-                for d in data:
-                    if d == '':
-                        ok = False
-                if ok:
+                if line.split(',')[1] != '':
                     fout.write(line + '\n')
                 else:
                     print(line + '\n')
+                    
     else:
         print('O ARQUIVO ESTA VAZIO')
     print('\n\n')
