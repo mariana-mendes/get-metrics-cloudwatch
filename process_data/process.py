@@ -3,6 +3,7 @@ import os.path
 from datetime import date, datetime, timedelta
 from log.setup import setup_log
 import constants as cons
+import json
 
 
 def createNewDf(datapoints, metric, value):
@@ -50,7 +51,7 @@ def editOrCreateFiles(newDict, folderName):
     logger = setup_log()
     newDf = pd.DataFrame(data=newDict)
 
-    today_file = date.today().strftime("%Y-%m-%d")
+    today_file = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
 
     path = os.path.join(os.getcwd(), "data", folderName)
     filePath = path + "/" + today_file + ".csv"
