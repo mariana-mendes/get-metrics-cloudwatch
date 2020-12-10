@@ -7,6 +7,7 @@ from collector.collector_boto import CollectorAgent as CWA
 from aws.API import API as api
 from sender.send_files import Sender as sender
 from log.setup import setup_log
+import os
 
 ''' Runs the collector. 
     Adjust the collector range and instantiate the Collector and the Sender'''
@@ -27,5 +28,7 @@ cwapi = api(data[cons.AWS_CONFIG]["region"])
 sender = sender(data[cons.AWS_CONFIG])
 logger = setup_log()
 logger.info(cons.STARTING_COLLECTOR)
+logger.info("The pid is {}".format(os.getpid()))
 collector.getMetrics()
+logger.info(cons.END_COLLECTOR)
 sender.send_files()
