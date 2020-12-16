@@ -9,78 +9,13 @@
                 "Maximum",
                 "Minimum"
             ]
-        },
-        {
-            "metricName": "HTTPCode_ELB_4XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "HTTPCode_ELB_5XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "HTTPCode_Target_2XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "HTTPCode_Target_3XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "HTTPCode_Target_4XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "HTTPCode_Target_5XX_Count",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "RequestCount",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
-        },
-        {
-            "metricName": "TargetResponseTime",
-            "namespace": "AWS/ApplicationELB",
-            "dimension": "LoadBalancer",
-            "statistics": [
-                "Sum"
-            ]
         }
     ],
-    "endTime": "2020-11-28T00:30:11.794031",
+    "endTime": "2020-12-15T00:30:11.794031",
     "period": "60",
-    "startTime": "2020-11-27T21:30:11.794045",
+    "startTime": "2020-12-15T21:30:11.794045",
     "storage": {
-        "InstanceId": "teste-1",
-        "LoadBalancer": "teste-2"
+        "InstanceId": "teste-1"
     },
     "aws-config": {
         "region": "us-east-1",

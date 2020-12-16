@@ -25,15 +25,19 @@ class CollectorAgent:
 
     ''' For each metric registered in config.json (metricsDescription) call retrieveFromCloudWatch'''
     def getMetrics(self):
+        all_metrics = []
         for metric in self.metrics:
-            self.retrieveFromCloudWatch(metric)
+            all_metrics.append(self.retrieveFromCloudWatch(metric))
+        editOrCreateFiles(all_metrics, metric, self.storage[metricDimension])
+
+
 
     ''' With the metric name and the dimension (id, name, unique value, etc), 
        retrieve the metric from CloudWatch for each dimension value'''
     def retrieveFromCloudWatch(self, metric):
         metricDimension = metric[cons.DIMENSION_KEY]
         valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
-
+        all_responses = []
         for value in valuesDimension:
             try:
                 response = self.client.get_metric_statistics(
@@ -50,10 +54,15 @@ class CollectorAgent:
                     Period=int(self.period),
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
-                joinMetrics(response, metric, value, self.storage[metricDimension])
+
+                metrics = joinMetrics(response, metric, value)
+                all_responses.append(metrics)
+                # joinMetrics(response, metric, value, self.storage[metricDimension])
 
             except exceptions.ClientError as error:
                 self.logger.error(error)
+        
+        return all_responses
 
 
     def getValueId(self, metricDimension, value):

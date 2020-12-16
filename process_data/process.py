@@ -31,25 +31,35 @@ def createNewDf(datapoints, metric, value):
     return newDict
 
 
-def joinMetrics(response, metric, value, folderName):
+def joinMetrics(response, metric, value):
     datapoints = response[cons.DATAPOINTS_KEY]
+    dts = []
+    
+    for data in datapoints:
+        dt = []
+        dt.append(data['Timestamp'].timestamp())
+        for m in metric:
+            dt.append(data[m])
+        dts.append(dt)
 
-    yesterdayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day != date.today().day) , datapoints  ))
+    return dts
 
-    if (len(yesterdayDTP) != 0):
-        yesterdayDf = createNewDf(yesterdayDTP, metric, value)
-        editOrCreateFiles(yesterdayDf, folderName)
+    # yesterdayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day != date.today().day) , datapoints  ))
 
-    todayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day == date.today().day) , datapoints  ))
+    # if (len(datapoints) != 0):
+    #     df = createNewDf(yesterdayDTP, metric, value)
+    #     editOrCreateFiles(yesterdayDf, folderName)
 
-    if (len(todayDTP) != 0):
-        todayDf = createNewDf(todayDTP, metric, value)
-        editOrCreateFiles(todayDf, folderName)
+    # todayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day == date.today().day) , datapoints  ))
+
+    # if (len(todayDTP) != 0):
+    #     todayDf = createNewDf(todayDTP, metric, value)
+    #     editOrCreateFiles(todayDf, folderName)
 
 
-def editOrCreateFiles(newDict, folderName):
+def editOrCreateFiles(newDict, header, folderName):
     logger = setup_log()
-    newDf = pd.DataFrame(data=newDict)
+    newDf = pd.DataFrame(data=newDict, columns = header)
 
     today_file = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
 

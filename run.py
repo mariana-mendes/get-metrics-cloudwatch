@@ -13,11 +13,11 @@ import os
     Adjust the collector range and instantiate the Collector and the Sender'''
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
-    endTime = datetime.utcnow().isoformat()
-    startTime = (datetime.utcnow() -
-                  timedelta(hours=cons.FREQUENCY_COLLECTOR)).isoformat()
-    data[cons.END_TIME_KEY] = endTime
-    data[cons.START_TIME_KEY] = startTime
+    # endTime = datetime.utcnow().isoformat()
+    # startTime = (datetime.utcnow() -
+    #               timedelta(hours=cons.FREQUENCY_COLLECTOR)).isoformat()
+    # data[cons.END_TIME_KEY] = endTime
+    # data[cons.START_TIME_KEY] = startTime
     f.seek(0)
     json.dump(data, f, indent=4)
     f.truncate()
@@ -31,4 +31,4 @@ logger.info(cons.STARTING_COLLECTOR)
 logger.info("The pid is {}".format(os.getpid()))
 collector.getMetrics()
 logger.info(cons.END_COLLECTOR)
-sender.send_files()
+# sender.send_files()
