@@ -26,18 +26,29 @@ class CollectorAgent:
 
     ''' For each metric registered in config.json (metricsDescription) call retrieveFromCloudWatch'''
     def getMetrics(self):
+        frames = {}
         for metric in self.metrics:
+
             metricDimension = metric[cons.DIMENSION_KEY]
+            
+            if not metricDimension in frames:
+                frames[metricDimension] = []
+            
             all_metric_data = []
             all_metric_data = all_metric_data + self.retrieveFromCloudWatch(metric)
 
-            col = ['timestamp', metric['dimension'], metric['metricName']]
+
+            col = ['timestamp', metricDimension, 'metricName']
+
             if 'statistics' in metric:
                 col = col + metric['statistics']
-
-            newDf = pd.DataFrame(data=all_metric_data, columns = col)
             
-            editOrCreateFiles(newDf, self.storage[metricDimension])
+            newDf = pd.DataFrame(data=all_metric_data, columns = col)
+            frames[metricDimension].append(newDf)
+
+        for f in frames:
+            result = pd.concat(frames[f])
+            editOrCreateFiles(result, self.storage[f])
 
 
 
@@ -63,7 +74,6 @@ class CollectorAgent:
                     Period=int(self.period),
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
-
                 metrics = joinMetrics(response, metric, value['InstanceId'])
                 all_responses = all_responses + metrics
 
@@ -99,16 +109,16 @@ class CollectorAgent:
         return stringLB
 
     def getDescriptionsASG(self):
-        response = self.api.describeAutoScalingGroups()
-        processASGFiles(response)
-        # try:
-        # except Exception as e:
-        #    self.logger.error('Error trying to get autoscaling group descriptions')
+        try:
+            response = self.api.describeAutoScalingGroups()
+            processASGFiles(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group descriptions')
 
     def getEventsASG(self):
-        response = self.api.getScalingActivities()
-        saveRawFile(response)
-        # try:
-        # except Exception as e:
-        #    self.logger.error('Error trying to get autoscaling group activities')
+        try:
+            response = self.api.getScalingActivities()
+            saveRawFile(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group activities')
 

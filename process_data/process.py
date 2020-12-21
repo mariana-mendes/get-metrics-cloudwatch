@@ -35,6 +35,7 @@ def joinMetrics(response, metric, value):
     datapoints = response[cons.DATAPOINTS_KEY]
     dts = []
     
+
     for data in datapoints:
         dt = []
         dt.append(data['Timestamp'].timestamp())
@@ -43,8 +44,6 @@ def joinMetrics(response, metric, value):
         if 'statistics' in metric:
             for s in metric['statistics']:
                 dt.append(data[s])
-        else:
-            print('Não tem statics :)')
         dts.append(dt)
 
     return dts
@@ -52,9 +51,6 @@ def joinMetrics(response, metric, value):
 def editOrCreateFiles(newDict, folderName):
     logger = setup_log()
     newDf = pd.DataFrame(data=newDict)
-    # col = ['timestamp', header['dimension'],header['metricName']] + header['statistics']
-
-    # newDf = pd.DataFrame(data=newDict, columns = col)
 
     today_file = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
 
