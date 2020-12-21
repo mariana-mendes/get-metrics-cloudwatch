@@ -38,28 +38,23 @@ def joinMetrics(response, metric, value):
     for data in datapoints:
         dt = []
         dt.append(data['Timestamp'].timestamp())
-        for m in metric:
-            dt.append(data[m])
+        dt.append(value)
+        dt.append(metric['metricName'])
+        if 'statistics' in metric:
+            for s in metric['statistics']:
+                dt.append(data[s])
+        else:
+            print('Não tem statics :)')
         dts.append(dt)
 
     return dts
 
-    # yesterdayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day != date.today().day) , datapoints  ))
-
-    # if (len(datapoints) != 0):
-    #     df = createNewDf(yesterdayDTP, metric, value)
-    #     editOrCreateFiles(yesterdayDf, folderName)
-
-    # todayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day == date.today().day) , datapoints  ))
-
-    # if (len(todayDTP) != 0):
-    #     todayDf = createNewDf(todayDTP, metric, value)
-    #     editOrCreateFiles(todayDf, folderName)
-
-
-def editOrCreateFiles(newDict, header, folderName):
+def editOrCreateFiles(newDict, folderName):
     logger = setup_log()
-    newDf = pd.DataFrame(data=newDict, columns = header)
+    newDf = pd.DataFrame(data=newDict)
+    # col = ['timestamp', header['dimension'],header['metricName']] + header['statistics']
+
+    # newDf = pd.DataFrame(data=newDict, columns = col)
 
     today_file = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
 
@@ -84,8 +79,9 @@ def editOrCreateFiles(newDict, header, folderName):
 def processASGFiles(response):
     autoscalingGroups = response['AutoScalingGroups']
     newDict = {}
-
     instanceIds, asgNames, timestamp = [], [], []
+    
+    df = []
 
     currentHour = datetime.now().timestamp()
 
@@ -94,12 +90,14 @@ def processASGFiles(response):
         instanceIds += list(map(_getInstanceId, asg['Instances']))
         asgNames += [asg['AutoScalingGroupName']] * qtyInstances
 
+
     timestamp = [currentHour] * len(instanceIds)
     newDict = {
         'timestamp': timestamp,
         'InstanceId': instanceIds,
         'AutoscalingGroup': asgNames
     }
+
     newDf = pd.DataFrame(data=newDict)
 
     editOrCreateFiles(newDf, 'asg')

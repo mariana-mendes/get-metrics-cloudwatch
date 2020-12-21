@@ -4,11 +4,12 @@ from botocore import exceptions
 import dateutil.parser
 import datetime
 from dateutil.tz import tzlocal
-from process_data.process import joinMetrics, saveRawFile, processASGFiles
+from process_data.process import joinMetrics, editOrCreateFiles, saveRawFile, processASGFiles
 from log.setup import setup_log
 import json
 from aws.API import API as api
 import numpy as np
+import pandas as pd
 
 
 class CollectorAgent:
@@ -25,10 +26,18 @@ class CollectorAgent:
 
     ''' For each metric registered in config.json (metricsDescription) call retrieveFromCloudWatch'''
     def getMetrics(self):
-        all_metrics = []
         for metric in self.metrics:
-            all_metrics.append(self.retrieveFromCloudWatch(metric))
-        editOrCreateFiles(all_metrics, metric, self.storage[metricDimension])
+            metricDimension = metric[cons.DIMENSION_KEY]
+            all_metric_data = []
+            all_metric_data = all_metric_data + self.retrieveFromCloudWatch(metric)
+
+            col = ['timestamp', metric['dimension'], metric['metricName']]
+            if 'statistics' in metric:
+                col = col + metric['statistics']
+
+            newDf = pd.DataFrame(data=all_metric_data, columns = col)
+            
+            editOrCreateFiles(newDf, self.storage[metricDimension])
 
 
 
@@ -55,9 +64,8 @@ class CollectorAgent:
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
 
-                metrics = joinMetrics(response, metric, value)
-                all_responses.append(metrics)
-                # joinMetrics(response, metric, value, self.storage[metricDimension])
+                metrics = joinMetrics(response, metric, value['InstanceId'])
+                all_responses = all_responses + metrics
 
             except exceptions.ClientError as error:
                 self.logger.error(error)
@@ -91,16 +99,16 @@ class CollectorAgent:
         return stringLB
 
     def getDescriptionsASG(self):
-        try:
-            response = self.api.describeAutoScalingGroups()
-            processASGFiles(response)
-        except Exception as e:
-           self.logger.error('Error trying to get autoscaling group descriptions')
+        response = self.api.describeAutoScalingGroups()
+        processASGFiles(response)
+        # try:
+        # except Exception as e:
+        #    self.logger.error('Error trying to get autoscaling group descriptions')
 
     def getEventsASG(self):
-        try:
-            response = self.api.getScalingActivities()
-            saveRawFile(response)
-        except Exception as e:
-           self.logger.error('Error trying to get autoscaling group activities')
+        response = self.api.getScalingActivities()
+        saveRawFile(response)
+        # try:
+        # except Exception as e:
+        #    self.logger.error('Error trying to get autoscaling group activities')
 
