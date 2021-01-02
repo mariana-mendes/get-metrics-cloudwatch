@@ -59,6 +59,7 @@ class CollectorAgent:
         valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
         all_responses = []
         for value in valuesDimension:
+            valueId =  self.getValueId(metricDimension, value)
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -66,7 +67,7 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": self.getValueId(metricDimension, value)
+                            "Value": valueId
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
@@ -74,7 +75,7 @@ class CollectorAgent:
                     Period=int(self.period),
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
-                metrics = joinMetrics(response, metric, value['InstanceId'])
+                metrics = joinMetrics(response, metric, valueId)
                 all_responses = all_responses + metrics
 
             except exceptions.ClientError as error:
