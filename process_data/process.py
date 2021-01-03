@@ -31,21 +31,22 @@ def createNewDf(datapoints, metric, value):
     return newDict
 
 
-def joinMetrics(response, metric, value, folderName):
+def joinMetrics(response, metric, value):
     datapoints = response[cons.DATAPOINTS_KEY]
+    dts = []
+    
 
-    yesterdayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day != date.today().day) , datapoints  ))
+    for data in datapoints:
+        dt = []
+        dt.append(data['Timestamp'].timestamp())
+        dt.append(value)
+        dt.append(metric['metricName'])
+        if 'statistics' in metric:
+            for s in metric['statistics']:
+                dt.append(data[s])
+        dts.append(dt)
 
-    if (len(yesterdayDTP) != 0):
-        yesterdayDf = createNewDf(yesterdayDTP, metric, value)
-        editOrCreateFiles(yesterdayDf, folderName)
-
-    todayDTP = list(  filter(  (lambda dtp: dtp['Timestamp'].replace(tzinfo=None).day == date.today().day) , datapoints  ))
-
-    if (len(todayDTP) != 0):
-        todayDf = createNewDf(todayDTP, metric, value)
-        editOrCreateFiles(todayDf, folderName)
-
+    return dts
 
 def editOrCreateFiles(newDict, folderName):
     logger = setup_log()
@@ -74,8 +75,9 @@ def editOrCreateFiles(newDict, folderName):
 def processASGFiles(response):
     autoscalingGroups = response['AutoScalingGroups']
     newDict = {}
-
     instanceIds, asgNames, timestamp = [], [], []
+    
+    df = []
 
     currentHour = datetime.now().timestamp()
 
@@ -84,12 +86,14 @@ def processASGFiles(response):
         instanceIds += list(map(_getInstanceId, asg['Instances']))
         asgNames += [asg['AutoScalingGroupName']] * qtyInstances
 
+
     timestamp = [currentHour] * len(instanceIds)
     newDict = {
         'timestamp': timestamp,
         'InstanceId': instanceIds,
         'AutoscalingGroup': asgNames
     }
+
     newDf = pd.DataFrame(data=newDict)
 
     editOrCreateFiles(newDf, 'asg')

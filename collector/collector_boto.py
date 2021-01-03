@@ -4,11 +4,12 @@ from botocore import exceptions
 import dateutil.parser
 import datetime
 from dateutil.tz import tzlocal
-from process_data.process import joinMetrics, saveRawFile, processASGFiles
+from process_data.process import joinMetrics, editOrCreateFiles, saveRawFile, processASGFiles
 from log.setup import setup_log
 import json
 from aws.API import API as api
 import numpy as np
+import pandas as pd
 
 
 class CollectorAgent:
@@ -25,16 +26,40 @@ class CollectorAgent:
 
     ''' For each metric registered in config.json (metricsDescription) call retrieveFromCloudWatch'''
     def getMetrics(self):
+        frames = {}
         for metric in self.metrics:
-            self.retrieveFromCloudWatch(metric)
+
+            metricDimension = metric[cons.DIMENSION_KEY]
+            
+            if not metricDimension in frames:
+                frames[metricDimension] = []
+            
+            all_metric_data = []
+            all_metric_data = all_metric_data + self.retrieveFromCloudWatch(metric)
+
+
+            col = ['timestamp', metricDimension, 'metricName']
+
+            if 'statistics' in metric:
+                col = col + metric['statistics']
+            
+            newDf = pd.DataFrame(data=all_metric_data, columns = col)
+            frames[metricDimension].append(newDf)
+
+        for f in frames:
+            result = pd.concat(frames[f])
+            editOrCreateFiles(result, self.storage[f])
+
+
 
     ''' With the metric name and the dimension (id, name, unique value, etc), 
        retrieve the metric from CloudWatch for each dimension value'''
     def retrieveFromCloudWatch(self, metric):
         metricDimension = metric[cons.DIMENSION_KEY]
         valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
-
+        all_responses = []
         for value in valuesDimension:
+            valueId =  self.getValueId(metricDimension, value)
             try:
                 response = self.client.get_metric_statistics(
                     Namespace=metric[cons.NAMESPACE_KEY],
@@ -42,7 +67,7 @@ class CollectorAgent:
                     Dimensions=[
                         {
                             "Name": metricDimension,
-                            "Value": self.getValueId(metricDimension, value)
+                            "Value": valueId
                         },
                     ],
                     StartTime=dateutil.parser.isoparse(self.start),
@@ -50,10 +75,13 @@ class CollectorAgent:
                     Period=int(self.period),
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
-                joinMetrics(response, metric, value, self.storage[metricDimension])
+                metrics = joinMetrics(response, metric, valueId)
+                all_responses = all_responses + metrics
 
             except exceptions.ClientError as error:
                 self.logger.error(error)
+        
+        return all_responses
 
 
     def getValueId(self, metricDimension, value):
