@@ -28,15 +28,14 @@ class CollectorAgent:
     def getMetrics(self):
         frames = {}
         for metric in self.metrics:
-
             metricDimension = metric[cons.DIMENSION_KEY]
             
             if not metricDimension in frames:
                 frames[metricDimension] = []
             
+            valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
             all_metric_data = []
-            all_metric_data = all_metric_data + self.retrieveFromCloudWatch(metric)
-
+            all_metric_data = all_metric_data + self.retrieveFromCloudWatch(metric, valuesDimension)
 
             col = ['timestamp', metricDimension, 'metricName']
 
@@ -54,9 +53,8 @@ class CollectorAgent:
 
     ''' With the metric name and the dimension (id, name, unique value, etc), 
        retrieve the metric from CloudWatch for each dimension value'''
-    def retrieveFromCloudWatch(self, metric):
+    def retrieveFromCloudWatch(self, metric, valuesDimension):
         metricDimension = metric[cons.DIMENSION_KEY]
-        valuesDimension = self.getDimensionValues(metric[cons.DIMENSION_KEY])
         all_responses = []
         for value in valuesDimension:
             valueId =  self.getValueId(metricDimension, value)
