@@ -39,4 +39,5 @@ for f in files:
 
 for key in data_frame:
     new_df = pd.DataFrame(data_frame[key], columns=data_frame_column)
-    new_df.to_csv(output_folder + '/' + key + '.csv', index=False)
+    new_df.reset_index(inplace=True, drop=True)
+    new_df.to_csv(output_folder + '/' + key + '.csv')
