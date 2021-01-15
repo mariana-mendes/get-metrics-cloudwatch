@@ -121,5 +121,5 @@ class CollectorAgent:
             response = self.api.getScalingActivities()
             saveRawFile(response)
         except Exception as e:
-           self.logger.error('Error trying to get autoscaling group activities')
+           self.logger.error('Error trying to get autoscaling group activities' + e)
 
