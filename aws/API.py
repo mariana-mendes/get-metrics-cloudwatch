@@ -17,7 +17,8 @@ class API:
      
     '''Get all auto-scaling groups description and return an array of AutoScalingGroupName'''
     def describeAutoScalingGroups(self):
-        return self.clientASG.describe_auto_scaling_groups()
+        paginator = self.clientASG.get_paginator('describe_auto_scaling_groups')
+        return paginator.paginate().build_full_result()
 
     
     '''Get all load balancers description and return'''
@@ -29,7 +30,9 @@ class API:
         return self.clientELBClassic.describe_load_balancers()['LoadBalancerDescriptions']    
     
     def getScalingActivities(self):
-        return self.clientASG.describe_scaling_activities()
+        paginator = self.clientASG.get_paginator('describe_scaling_activities')
+        return paginator.paginate(PaginationConfig={'MaxItems': 3000}).build_full_result()
+        # return self.clientASG.describe_scaling_activities()
 
 
 
