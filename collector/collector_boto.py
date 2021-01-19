@@ -48,6 +48,7 @@ class CollectorAgent:
 
         for f in frames:
             result = pd.concat(frames[f])
+            result.reset_index(inplace=True, drop=True)
             editOrCreateFiles(result, self.storage[f])
 
 
