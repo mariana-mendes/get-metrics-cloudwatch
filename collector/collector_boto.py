@@ -40,6 +40,9 @@ class CollectorAgent:
 
             col = ['timestamp', metricDimension, 'metricName']
 
+            if(metricDimension== cons.INSTANCE_ID_KEY):
+                col = col + ['InstanceType']
+
             if 'statistics' in metric:
                 col = col + metric['statistics']
             
@@ -76,7 +79,11 @@ class CollectorAgent:
                     Period=int(self.period),
                     Statistics=metric[cons.STATISTICS_KEY],
                 )
-                metrics = joinMetrics(response, metric, valueId)
+
+                info = ''
+                if(metricDimension== cons.INSTANCE_ID_KEY):
+                    info = value['InstanceType']
+                metrics = joinMetrics(response, metric, valueId, info)
                 all_responses = all_responses + metrics
 
             except exceptions.ClientError as error:

@@ -5,42 +5,44 @@ from log.setup import setup_log
 import constants as cons
 import json
 
+# TO-DO: remover método
 
-def createNewDf(datapoints, metric, value):
+# def createNewDf(datapoints, metric, value):
 
-    statistics = metric[cons.STATISTICS_KEY]
-    timestampArray = list(map(lambda dtp: (dtp['Timestamp']).timestamp(), datapoints))
-    newDict = {'timestamp': timestampArray}
-    totalRows = len(newDict['timestamp'])
-    for stat in statistics: 
-        statValues = list(map(lambda dtp: dtp[stat], datapoints))
-        newDict[stat] = statValues
+#     statistics = metric[cons.STATISTICS_KEY]
+#     timestampArray = list(map(lambda dtp: (dtp['Timestamp']).timestamp(), datapoints))
+#     newDict = {'timestamp': timestampArray}
+#     totalRows = len(newDict['timestamp'])
+#     for stat in statistics: 
+#         statValues = list(map(lambda dtp: dtp[stat], datapoints))
+#         newDict[stat] = statValues
 
-    dimension = metric[cons.DIMENSION_KEY]
-    if(metric[cons.DIMENSION_KEY] == "LoadBalancer"):
-        dimension =  "LoadBalancerName"
+#     dimension = metric[cons.DIMENSION_KEY]
+#     if(metric[cons.DIMENSION_KEY] == "LoadBalancer"):
+#         dimension =  "LoadBalancerName"
 
-    newDict[dimension] = [value[dimension]] * totalRows
-    newDict[cons.METRIC_NAME_KEY]  = [metric[cons.METRIC_NAME_KEY]]* totalRows
+#     newDict[dimension] = [value[dimension]] * totalRows
+#     newDict[cons.METRIC_NAME_KEY]  = [metric[cons.METRIC_NAME_KEY]]* totalRows
 
 
-    if(metric[cons.DIMENSION_KEY] == cons.INSTANCE_ID_KEY):
-        flavor = value['InstanceType']
-        newDict['InstanceType'] = [flavor] * totalRows
+#     if(metric[cons.DIMENSION_KEY] == cons.INSTANCE_ID_KEY):
+#         flavor = value['InstanceType']
+#         newDict['InstanceType'] = [flavor] * totalRows
    
-    return newDict
+#     return newDict
 
 
-def joinMetrics(response, metric, value):
+def joinMetrics(response, metric, value, info = ''):
     datapoints = response[cons.DATAPOINTS_KEY]
     dts = []
     
-
     for data in datapoints:
         dt = []
         dt.append(data['Timestamp'].timestamp())
         dt.append(value)
         dt.append(metric['metricName'])
+        if(len(info) != 0):
+            dt.append(info)
         if 'statistics' in metric:
             for s in metric['statistics']:
                 dt.append(data[s])
