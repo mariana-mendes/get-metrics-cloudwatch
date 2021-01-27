@@ -88,7 +88,6 @@ def processASGFiles(response):
         instanceIds += list(map(_getInstanceId, asg['Instances']))
         asgNames += [asg['AutoScalingGroupName']] * qtyInstances
 
-
     timestamp = [currentHour] * len(instanceIds)
     newDict = {
         'timestamp': timestamp,
@@ -97,8 +96,8 @@ def processASGFiles(response):
     }
 
     newDf = pd.DataFrame(data=newDict)
-
-    editOrCreateFiles(newDf, 'asg')
+    return newDf
+    # editOrCreateFiles(newDf, 'asg')
 
 
 def _getInstanceId(item):
@@ -132,4 +131,4 @@ def saveRawFile(response):
     }
     newDf = pd.DataFrame(data=newDict)
 
-    editOrCreateFiles(newDf, 'asg-events')
+    return newDf

@@ -18,5 +18,5 @@ with open(cons.CONFIG_FILE, 'r+') as f:
     f.truncate()
 
 collector = CWA(data[cons.METRICS_KEY],  data[cons.START_TIME_KEY],  data[cons.END_TIME_KEY], data[cons.PERIOD_KEY], data[cons.STORAGE], data[cons.AWS_CONFIG])
-collector.getDescriptionsASG()
-collector.getEventsASG()
+collector.createDescriptionsASGFile()
+collector.createEventsASGFile()
