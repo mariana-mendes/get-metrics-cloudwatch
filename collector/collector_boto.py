@@ -110,14 +110,27 @@ class CollectorAgent:
     def getDescriptionsASG(self):
         try:
             response = self.api.describeAutoScalingGroups()
-            processASGFiles(response)
+            return processASGFiles(response)
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group descriptions')
+
+    def createDescriptionsASGFile(self):
+        try:
+            descriptionsASG = getDescriptionsASG()
+            editOrCreateFiles(descriptionsASG, 'asg')
         except Exception as e:
            self.logger.error('Error trying to get autoscaling group descriptions')
 
     def getEventsASG(self):
         try:
             response = self.api.getScalingActivities()
-            saveRawFile(response)
+            return saveRawFile(response)
         except Exception as e:
            self.logger.error('Error trying to get autoscaling group activities')
 
+    def createEventsASGFile(self):
+        try:
+            eventsASG = getEventsASG()
+            editOrCreateFiles(eventsASG, 'asg-events')
+        except Exception as e:
+           self.logger.error('Error trying to get autoscaling group activities')
