@@ -21,23 +21,20 @@ class SendS3:
     def bucketExists(self):
        return not self.s3.Bucket(self.bucket).creation_date is None 
 
-    def send_folder(self, path):
+    def send_folder(self, folder):
         self.logger.info(cons.STARTING_SEND_FILES)
-        if(path[len(path)-1] == '/'):
-            path = path[:-1] 
-        folderName = path.split("/")[-1]
+        parentPath = os.getcwd()
+        if(folder[len(folder)-1] == '/'):
+            folder = folder[:-1] 
+        folderName = folder.split("/")[-1]
         zipName = folderName + ".zip"
-        pathZip = os.getcwd() + zipName
+        pathZip = parentPath + zipName
         folderS3 = folderName + "/" + zipName
         
         try:
             zipf = zipfile.ZipFile(zipName, 'w', zipfile.ZIP_DEFLATED)
-            self.zipdir(path, zipf)
-            print("Teste")
+            self.zipdir(parentPath + folder, zipf)
             if(self.bucketExists()):
-                print(zipName)
-                print(self.bucket)
-                print(folderS3)
                 response = self.client.upload_file(zipName, self.bucket, folderS3)
             else: 
                 self.logger.error("Unsend folder - Bucket {} doesn't existis".format(self.bucket))
