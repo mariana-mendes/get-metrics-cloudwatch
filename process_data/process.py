@@ -77,8 +77,9 @@ def editOrCreateFiles(newDict, folderName):
 def processASGFiles(response):
     autoscalingGroups = response['AutoScalingGroups']
     newDict = {}
-    instanceIds, asgNames, timestamp, asgTags = [], [], [], []
-
+    instanceIds, asgNames, timestamp = [], [], []
+    asgAplicationName, asgEnvironment, asgName, asgOwner, asgProduct = [], [], [], [], []
+    
     currentHour = datetime.now().timestamp()
 
     for asg in autoscalingGroups:
@@ -86,22 +87,46 @@ def processASGFiles(response):
         instanceIds += list(map(_getInstanceId, asg['Instances']))
         asgNames += [asg['AutoScalingGroupName']] * qtyInstances
 
-        tags = ''
-        for tag in asg['Tags']:
-            if('Key' in tag and 'Value' in tag): 
-                desiredTags = ['AplicationName', 'Environment', 'Name', 'Owner', 'Product']
-                if tag['Key'] in desiredTags:
-                    tags += tag['Key'] + ':' + tag['Value'] + '; '
-    
-        asgTags += [tags] * qtyInstances
+        tagsFind = [False,False,False,False,False]
+        for tag in asg['Tags']:    
+            if 'Key' in tag and 'Value' in tag:
+                if tag['Key'] == 'AplicationName':
+                    tagsFind[0] = True
+                    asgAplicationName += [tag['Value']] * qtyInstances
+                elif tag['Key'] == 'Environment':
+                    tagsFind[1] = True
+                    asgEnvironment += [tag['Value']] * qtyInstances
+                elif tag['Key'] == 'Name':
+                    tagsFind[2] = True
+                    asgName += [tag['Value']] * qtyInstances
+                elif tag['Key'] == 'Owner':
+                    tagsFind[3] = True
+                    asgOwner += [tag['Value']] * qtyInstances
+                elif tag['Key'] == 'Product':
+                    tagsFind[4] = True
+                    asgProduct += [tag['Value']] * qtyInstances
 
+        if not tagsFind[0]:
+            asgAplicationName += [""] * qtyInstances
+        if not tagsFind[1]:
+            asgEnvironment += [""] * qtyInstances
+        if not tagsFind[2]:
+            asgName += [""] * qtyInstances
+        if not tagsFind[3]:
+            asgOwner += [""] * qtyInstances
+        if not tagsFind[4]:
+            asgProduct += [""] * qtyInstances
 
     timestamp = [currentHour] * len(instanceIds)
     newDict = {
         'timestamp': timestamp,
         'InstanceId': instanceIds,
         'AutoscalingGroup': asgNames,
-        'Tags': asgTags
+        'AplicationName': asgAplicationName, 
+        'Environment': asgEnvironment, 
+        'Name': asgName, 
+        'Owner': asgOwner,
+        'Product': asgProduct
     }
 
     newDf = pd.DataFrame(data=newDict)
