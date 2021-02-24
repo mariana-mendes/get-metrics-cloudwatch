@@ -77,9 +77,7 @@ def editOrCreateFiles(newDict, folderName):
 def processASGFiles(response):
     autoscalingGroups = response['AutoScalingGroups']
     newDict = {}
-    instanceIds, asgNames, timestamp = [], [], []
-    
-    df = []
+    instanceIds, asgNames, timestamp, asgTags = [], [], [], []
 
     currentHour = datetime.now().timestamp()
 
@@ -88,12 +86,22 @@ def processASGFiles(response):
         instanceIds += list(map(_getInstanceId, asg['Instances']))
         asgNames += [asg['AutoScalingGroupName']] * qtyInstances
 
+        tags = ''
+        for tag in asg['Tags']:
+            if('Key' in tag and 'Value' in tag): 
+                desiredTags = ['AplicationName', 'Environment', 'Name', 'Owner', 'Product']
+                if tag['Key'] in desiredTags:
+                    tags += tag['Key'] + ':' + tag['Value'] + '; '
+    
+        asgTags += [tags] * qtyInstances
+
 
     timestamp = [currentHour] * len(instanceIds)
     newDict = {
         'timestamp': timestamp,
         'InstanceId': instanceIds,
-        'AutoscalingGroup': asgNames
+        'AutoscalingGroup': asgNames,
+        'Tags': asgTags
     }
 
     newDf = pd.DataFrame(data=newDict)
