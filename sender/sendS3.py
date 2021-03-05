@@ -3,7 +3,8 @@ from log.setup import setup_log
 import boto3
 import constants as cons
 import os
-import zipfile
+# import zipfile
+import tarfile
 
 class SendS3:
     def __init__(self, awsconfig):
@@ -28,12 +29,11 @@ class SendS3:
             folder = folder[:-1] 
         folderName = folder.split("/")[-1]
         zipName = folderName + ".zip"
-        pathZip = parentPath + zipName
         folderS3 = folderName + "/" + zipName
         
         try:
-            zipf = zipfile.ZipFile(zipName, 'w', zipfile.ZIP_DEFLATED)
-            self.zipdir(parentPath + folder, zipf)
+            with tarfile.open(zipName, "w:gz") as tar:
+                tar.add(parentPath + folder, arcname=os.path.basename(folderName))
             if(self.bucketExists()):
                 response = self.client.upload_file(zipName, self.bucket, folderS3)
             else: 
