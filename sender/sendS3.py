@@ -3,7 +3,6 @@ from log.setup import setup_log
 import boto3
 import constants as cons
 import os
-# import zipfile
 import tarfile
 
 class SendS3:
@@ -36,6 +35,7 @@ class SendS3:
                 tar.add(parentPath + folder, arcname=os.path.basename(folderName))
             if(self.bucketExists()):
                 response = self.client.upload_file(zipName, self.bucket, folderS3)
+                os.remove(zipName)
             else: 
                 self.logger.error("Unsend folder - Bucket {} doesn't existis".format(self.bucket))
         except Exception as e:
