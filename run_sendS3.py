@@ -14,7 +14,6 @@ import os
 with open(cons.CONFIG_FILE, 'r+') as f:
     data = json.load(f)
 
-cwapi = api(data[cons.AWS_CONFIG]["region"])
 sender = sender(data[cons.AWS_CONFIG])
 logger = setup_log()
 sender.send_folder('/data/')

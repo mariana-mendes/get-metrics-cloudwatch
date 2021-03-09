@@ -13,11 +13,6 @@ class SendS3:
         self.bucket = awsconfig["bucket"]
         self.s3 = boto3.resource('s3')
 
-    def zipdir(self, path, ziph):
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                ziph.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), os.path.join(path, '..')))
-
     def bucketExists(self):
        return not self.s3.Bucket(self.bucket).creation_date is None 
 

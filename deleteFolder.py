@@ -14,3 +14,4 @@ folder = args.folder
 dirpath = Path(os.getcwd(), folder)
 if dirpath.exists() and dirpath.is_dir():
     shutil.rmtree(dirpath)
+    os.mkdir(dirpath)
