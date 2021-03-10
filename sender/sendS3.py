@@ -23,6 +23,8 @@ class SendS3:
             folder = folder[:-1] 
         folderName = folder.split("/")[-1]
         zipName = folderName + ".zip"
+        ## dataLastBackup = self.getLastBackup()
+        ## defined actual data and last backup data. 
         folderS3 = folderName + "/" + zipName
         
         try:
@@ -31,6 +33,7 @@ class SendS3:
             if(self.bucketExists()):
                 response = self.client.upload_file(zipName, self.bucket, folderS3)
                 os.remove(zipName)
+                self.logger.info('backup:{}'.format(date.today().strftime("%Y-%m-%d")))
             else: 
                 self.logger.error("Unsend folder - Bucket {} doesn't existis".format(self.bucket))
         except Exception as e:
@@ -38,3 +41,14 @@ class SendS3:
 
         self.logger.info("Finishing data send to s3 bucket.")
 
+    def getLastBackup(self): 
+        infile = os.getcwd() + '/app.log'
+        backups = []
+        with open(infile) as f:
+            f = f.readlines()
+
+        for line in f:
+            if 'backup' in line: 
+                backups.append(line)
+
+        return backups[-1].split('backup:')[-1]
