@@ -23,7 +23,6 @@ class SendS3:
             folder = folder[:-1] 
         folderName = folder.split("/")[-1]
         zipName = folderName + ".zip"
-        ## defined actual data and last backup data. 
         dateLastBackup = self.getLastBackup()
         dateCurrentBackup = date.today().strftime("%Y-%m-%d")
 
@@ -54,8 +53,13 @@ class SendS3:
         for line in f:
             if 'backup' in line: 
                 backups.append(line)
+        
+        bckp = 'undefined_data'
 
-        return backups[-1].split('backup:')[-1].rstrip('\n')
+        if len(backups) != 0:
+            bckp = backups[-1].split('backup:')[-1].rstrip('\n')
+
+        return bckp
 
     def zipdir(self, path, ziph):
         for root, dirs, files in os.walk(path):
