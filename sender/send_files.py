@@ -5,6 +5,8 @@ import constants as cons
 import tarfile
 import os
 
+
+## DEPRECATED. USING SENDS3.PY
 class Sender:
     def __init__(self, awsconfig):
         self.logger = setup_log()
