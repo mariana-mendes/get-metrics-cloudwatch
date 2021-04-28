@@ -16,6 +16,11 @@ args = parser.parse_args()
 folder = args.folder
 output_folder = args.output_folder
 
+lb = "LoadBalancerName"
+
+if(folder.find("teste-2")):
+    lb = "LoadBalancer"
+
 ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read()
 files = ls_files.split("\n")
 files.pop()
@@ -27,5 +32,5 @@ for f in files:
     print(f)
     df = pd.read_csv(folder + '/' + f, index_col=0)
     index = list(df.index.values)
-    df = df.drop_duplicates(subset=['timestamp','LoadBalancerName']) #df[~df.index.duplicated(keep='first')]
+    df = df.drop_duplicates(subset=['timestamp',lb]) #df[~df.index.duplicated(keep='first')]
     df.to_csv(output_folder + '/' + f)
