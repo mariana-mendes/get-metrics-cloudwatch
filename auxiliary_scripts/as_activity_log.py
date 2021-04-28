@@ -20,14 +20,13 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
-data_frame_day = {}
 
 for f in files:
+    print(f)
     df = pd.read_csv(folder + '/' + f, index_col=0)
+    data = []
     for i in range(0,len(df.index)):
         description = df.loc[i,'Description']
-        start_time = df.loc[i,'StartTime']
-        start_date = time.strftime('%Y-%m-%d', time.localtime(start_time))
         row = df.loc[i]
         arr = row.array
         
@@ -43,11 +42,7 @@ for f in files:
         else:
             new_arr = np.array([*new_arr, 'Update'])
 
-        if (not (start_date in data_frame_day.keys())):
-            data_frame_day[start_date] = []
-        data_frame_day[start_date].append(new_arr)
-
-for key in data_frame_day:
-    new_df = pd.DataFrame(data_frame_day[key], columns=['ActivityId','AutoScalingGroupName','Description','Cause','StartTime','EndTime','StatusCode','ActionActor','Scaling'])
+        data.append(new_arr)
+    new_df = pd.DataFrame(data, columns=['ActivityId','AutoScalingGroupName','Description','Cause','StartTime','EndTime','StatusCode','ActionActor','Scaling'])
     new_df = new_df.drop_duplicates(subset=['ActivityId'])
-    new_df.to_csv(output_folder + '/' + key + '.csv', index=False)
+    new_df.to_csv(output_folder + '/' + f)

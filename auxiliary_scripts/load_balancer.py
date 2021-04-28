@@ -20,25 +20,12 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
-data_frame_day = {}
 
 head = []
 
 for f in files:
     print(f)
     df = pd.read_csv(folder + '/' + f, index_col=0)
-    head = df.columns.values
     index = list(df.index.values)
-    df = df[~df.index.duplicated(keep='first')]
-    for i in index:
-        timestamp = df.loc[i,'timestamp']
-        date = time.strftime('%Y-%m-%d', time.localtime(timestamp))
-        row = df.loc[i]
-        if (not (date in data_frame_day.keys())):
-            data_frame_day[date] = []
-        data_frame_day[date].append(row)
-
-for key in data_frame_day:
-    print(key)
-    new_df = pd.DataFrame(data_frame_day[key], columns = head)
-    new_df.to_csv(output_folder + '/' + key + '.csv', index = False)
+    df = df.drop_duplicates(subset=['timestamp','LoadBalancerName']) #df[~df.index.duplicated(keep='first')]
+    df.to_csv(output_folder + '/' + f)

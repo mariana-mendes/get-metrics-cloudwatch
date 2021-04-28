@@ -20,36 +20,27 @@ ls_files = os.popen('ls {folder} | egrep "\.csv"'.format(folder = folder)).read(
 files = ls_files.split("\n")
 files.pop()
 
-data_frame_day = {}
-
-head = []
-
 for f in files:
     print(f)
+    head = []
+    data = []
     df = pd.read_csv(folder + '/' + f, index_col=0)
     head = df.columns.values
     index = list(df.index.values)
-    df = df[~df.index.duplicated(keep='first')]
-    for i in index:
+    df = df.drop_duplicates(subset=['timestamp','InstanceId','metricName'])
+    for (i,row) in df.iterrows():
         metrics_ok = True
         if 'Average' in head:
-            metrics_ok = (metrics_ok and df.loc[i,'Average'] <= 100)
+            metrics_ok = (metrics_ok and row['Average'] <= 100)
         if 'Maximum' in head:
-            metrics_ok = (metrics_ok and df.loc[i,'Maximum'] <= 100)
+            metrics_ok = (metrics_ok and row['Maximum'] <= 100)
         if 'Minimum' in head:
-            metrics_ok = (metrics_ok and df.loc[i,'Minimum'] <= 100)
+            metrics_ok = (metrics_ok and row['Minimum'] <= 100)
         if 'Sum' in head:
-            metrics_ok = (metrics_ok and df.loc[i,'Sum'] <= 100)
+            metrics_ok = (metrics_ok and row['Sum'] <= 100)
         
         if metrics_ok:
-            timestamp = df.loc[i,'timestamp']
-            date = time.strftime('%Y-%m-%d', time.localtime(timestamp))
-            row = df.loc[i]
-            if (not (date in data_frame_day.keys())):
-                data_frame_day[date] = []
-            data_frame_day[date].append(row)
-
-for key in data_frame_day:
-    print(key)
-    new_df = pd.DataFrame(data_frame_day[key], columns = head)
-    new_df.to_csv(output_folder + '/' + key + '.csv', index = False)
+            data.append(row)
+    print("Salvando...")
+    new_df = pd.DataFrame(data, columns = head)
+    new_df.to_csv(output_folder + '/' + f)
